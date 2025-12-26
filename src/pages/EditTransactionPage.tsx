@@ -71,7 +71,7 @@ const EditTransactionPage = () => {
 
   const categories = formData.type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!formData.amount || !formData.category || !transaction) {
@@ -95,15 +95,17 @@ const EditTransactionPage = () => {
         description: formData.description,
         date: formData.date,
         type: formData.type,
-        tags: formData.tags.length > 0 ? formData.tags : undefined,
-        notes: formData.notes || undefined,
+        ...(formData.tags.length > 0 && { tags: formData.tags }),
+        ...(formData.notes && { notes: formData.notes }),
       };
 
-      updateTransaction(transaction.id, updatedTransaction);
+      await updateTransaction(transaction.id, updatedTransaction);
       showSuccess('Cập nhật giao dịch thành công!');
       navigate('/transactions');
-    } catch (error) {
-      showError('Có lỗi xảy ra khi cập nhật giao dịch');
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Có lỗi xảy ra khi cập nhật giao dịch';
+      console.error('[Edit Transaction Page Error]', error);
+      showError(errorMessage);
     }
   };
 

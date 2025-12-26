@@ -161,7 +161,7 @@ const ScanBillPage = () => {
         description: formData.description || (analysisResult?.merchantName ? analysisResult.merchantName : 'Hóa đơn'),
         date: formData.date,
         type: 'expense',
-        notes: extractedText ? `Text từ bill: ${extractedText.substring(0, 300)}...` : undefined,
+        ...(extractedText && { notes: `Text từ bill: ${extractedText.substring(0, 300)}...` }),
       };
 
       await addTransaction(transaction);
@@ -174,7 +174,7 @@ const ScanBillPage = () => {
     }
   };
 
-  const handleAutoSave = () => {
+  const handleAutoSave = async () => {
     try {
       if (!analysisResult) {
         showError('Không có dữ liệu để lưu.');
@@ -204,14 +204,16 @@ const ScanBillPage = () => {
         description: analysisResult.description,
         date: analysisResult.date,
         type: 'expense',
-        notes: extractedText ? `Text từ bill: ${extractedText.substring(0, 300)}...` : undefined,
+        ...(extractedText && { notes: `Text từ bill: ${extractedText.substring(0, 300)}...` }),
       };
 
-      addTransaction(transaction);
+      await addTransaction(transaction);
       showSuccess('Đã tự động thêm giao dịch từ bill!');
       navigate('/transactions');
-    } catch (error) {
-      showError('Lỗi khi tự động lưu: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Lỗi khi tự động lưu. Vui lòng thử lại.';
+      console.error('[Auto Save Error]', error);
+      showError(errorMessage);
     }
   };
 

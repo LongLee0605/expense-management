@@ -50,8 +50,8 @@ const AddTransactionPage = () => {
       description: formData.description,
       date: formData.date,
       type,
-      tags: formData.tags.length > 0 ? formData.tags : undefined,
-      notes: formData.notes || undefined,
+      ...(formData.tags.length > 0 && { tags: formData.tags }),
+      ...(formData.notes && { notes: formData.notes }),
     };
 
     try {

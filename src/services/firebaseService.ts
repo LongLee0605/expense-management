@@ -30,6 +30,28 @@ const convertFromFirestore = <T extends { date?: string }>(data: any): T => {
   return converted as T;
 };
 
+const removeUndefinedFields = (obj: any): any => {
+  if (obj === null || obj === undefined) {
+    return obj;
+  }
+  if (obj instanceof Date || obj?.toDate || obj?.seconds !== undefined) {
+    return obj;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(removeUndefinedFields);
+  }
+  if (typeof obj === 'object' && obj.constructor === Object) {
+    const cleaned: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== undefined) {
+        cleaned[key] = removeUndefinedFields(value);
+      }
+    }
+    return cleaned;
+  }
+  return obj;
+};
+
 export const transactionsService = {
   getCollectionPath: (userId: string) => `users/${userId}/transactions`,
 
@@ -54,10 +76,12 @@ export const transactionsService = {
   async add(userId: string, transaction: Expense): Promise<void> {
     try {
       const transactionRef = doc(db, this.getCollectionPath(userId), transaction.id);
-      await setDoc(transactionRef, {
+      const transactionData = {
         ...transaction,
         date: Timestamp.fromDate(new Date(transaction.date)),
-      });
+      };
+      const cleanedData = removeUndefinedFields(transactionData);
+      await setDoc(transactionRef, cleanedData);
     } catch (error: any) {
       if (error?.code !== 'permission-denied') {
       }
@@ -69,10 +93,12 @@ export const transactionsService = {
     try {
       const transactionRef = doc(db, this.getCollectionPath(userId), id);
       const { id: _, ...transactionData } = transaction;
-      await updateDoc(transactionRef, {
+      const updateData = {
         ...transactionData,
         date: Timestamp.fromDate(new Date(transaction.date)),
-      });
+      };
+      const cleanedData = removeUndefinedFields(updateData);
+      await updateDoc(transactionRef, cleanedData);
     } catch (error: any) {
       if (error?.code !== 'permission-denied') {
       }
