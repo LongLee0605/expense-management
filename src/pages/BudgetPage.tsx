@@ -53,10 +53,10 @@ const BudgetPage = () => {
   };
 
   return (
-    <div className="space-y-6 pb-20">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Quản lý ngân sách</h2>
-        <Button onClick={() => setShowForm(!showForm)}>
+    <div className="space-y-4 sm:space-y-6 pb-20">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
+        <h2 className="text-lg sm:text-xl md:text-2xl font-bold">Quản lý ngân sách</h2>
+        <Button onClick={() => setShowForm(!showForm)} className="w-full sm:w-auto">
           {showForm ? 'Hủy' : '+ Thêm ngân sách'}
         </Button>
       </div>

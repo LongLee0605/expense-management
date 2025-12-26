@@ -40,15 +40,15 @@ const SmartInsightsWidget = ({ insights }: SmartInsightsWidgetProps) => {
 
   return (
     <Card>
-      <h2 className="text-xl font-semibold mb-4">💡 Insights thông minh</h2>
+      <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">💡 Insights thông minh</h2>
       <div className="space-y-3">
         {insights.map((insight, index) => (
           <div
             key={index}
-            className={`p-4 rounded-lg border-l-4 ${getBgColor(insight.type)}`}
+            className={`p-3 sm:p-4 rounded-lg border-l-4 ${getBgColor(insight.type)}`}
           >
             <div className="flex items-start space-x-3">
-              <span className={`text-2xl ${getIconColor(insight.type)}`}>
+              <span className={`text-xl sm:text-2xl flex-shrink-0 ${getIconColor(insight.type)}`}>
                 {insight.icon}
               </span>
               <div className="flex-1">

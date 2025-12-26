@@ -18,14 +18,14 @@ const Navigation = () => {
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
-                `flex flex-col items-center justify-center py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm font-medium transition-colors min-w-0 ${
+                `flex flex-col items-center justify-center py-1.5 sm:py-2 md:py-3 px-1 sm:px-2 md:px-4 text-[10px] sm:text-xs md:text-sm font-medium transition-colors min-w-0 ${
                   isActive
                     ? 'text-blue-600'
                     : 'text-gray-600 hover:text-gray-900'
                 }`
               }
             >
-              <span className="text-xl sm:text-2xl mb-1">{item.icon}</span>
+              <span className="text-lg sm:text-xl md:text-2xl mb-0.5 sm:mb-1">{item.icon}</span>
               <span className="truncate w-full text-center">{item.label}</span>
             </NavLink>
           ))}

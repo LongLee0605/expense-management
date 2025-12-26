@@ -71,7 +71,7 @@ const StatisticsPage = () => {
   const totalIncome = incomeByCategory.reduce((sum, item) => sum + item.amount, 0);
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-4 sm:space-y-6 pb-20">
       {/* Chi tiêu theo danh mục */}
       <Card>
         <h2 className="text-xl font-semibold mb-4">Chi tiêu theo danh mục</h2>
@@ -85,7 +85,7 @@ const StatisticsPage = () => {
                 <div key={index} className="space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <span className="text-2xl">{item.icon}</span>
+                      <span className="text-xl sm:text-2xl flex-shrink-0">{item.icon}</span>
                       <span className="font-medium">{item.category}</span>
                     </div>
                     <div className="text-right">
@@ -124,7 +124,7 @@ const StatisticsPage = () => {
                 <div key={index} className="space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <span className="text-2xl">{item.icon}</span>
+                      <span className="text-xl sm:text-2xl flex-shrink-0">{item.icon}</span>
                       <span className="font-medium">{item.category}</span>
                     </div>
                     <div className="text-right">

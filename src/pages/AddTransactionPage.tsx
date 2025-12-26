@@ -67,8 +67,8 @@ const AddTransactionPage = () => {
 
   return (
     <div className="max-w-2xl mx-auto pb-20">
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-2xl font-bold mb-6">Thêm giao dịch mới</h2>
+      <div className="bg-white rounded-lg shadow p-4 sm:p-5 md:p-6">
+        <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-6">Thêm giao dịch mới</h2>
 
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -106,11 +106,11 @@ const AddTransactionPage = () => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           <div>
             <label
               htmlFor="currency"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-xs sm:text-sm font-medium text-gray-700 mb-2"
             >
               Loại tiền tệ *
             </label>
@@ -141,7 +141,7 @@ const AddTransactionPage = () => {
           <div>
             <label
               htmlFor="amount"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-xs sm:text-sm font-medium text-gray-700 mb-2"
             >
               Số tiền * ({formData.currency})
             </label>
@@ -170,7 +170,7 @@ const AddTransactionPage = () => {
           <div>
             <label
               htmlFor="category"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-xs sm:text-sm font-medium text-gray-700 mb-2"
             >
               Danh mục *
             </label>
@@ -195,7 +195,7 @@ const AddTransactionPage = () => {
           <div>
             <label
               htmlFor="description"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-xs sm:text-sm font-medium text-gray-700 mb-2"
             >
               Mô tả
             </label>
@@ -214,7 +214,7 @@ const AddTransactionPage = () => {
           <div>
             <label
               htmlFor="date"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-xs sm:text-sm font-medium text-gray-700 mb-2"
             >
               Ngày
             </label>
@@ -297,7 +297,7 @@ const AddTransactionPage = () => {
           <div>
             <label
               htmlFor="notes"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-xs sm:text-sm font-medium text-gray-700 mb-2"
             >
               Ghi chú
             </label>

@@ -5,6 +5,7 @@ import App from './App';
 import { ToastProvider } from './contexts/ToastContext';
 import { AuthProvider } from './contexts/AuthContext';
 import './index.css';
+import './styles/recharts.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

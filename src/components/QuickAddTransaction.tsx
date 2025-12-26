@@ -78,7 +78,7 @@ const QuickAddTransaction = ({ onSuccess }: QuickAddTransactionProps) => {
   return (
     <Card>
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">Thêm giao dịch nhanh</h3>
+        <h3 className="text-base sm:text-lg font-semibold">Thêm giao dịch nhanh</h3>
         <button
           onClick={() => setIsOpen(false)}
           className="text-gray-500 hover:text-gray-700"
@@ -87,7 +87,7 @@ const QuickAddTransaction = ({ onSuccess }: QuickAddTransactionProps) => {
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
         <div className="flex space-x-2">
           <button
             type="button"
@@ -113,7 +113,7 @@ const QuickAddTransaction = ({ onSuccess }: QuickAddTransactionProps) => {
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Số tiền *

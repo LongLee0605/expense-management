@@ -50,31 +50,23 @@ const ExpenseSineChart = ({ transactions, currency = 'VND' }: ExpenseSineChartPr
   }
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+    <div className="w-full" style={{ minHeight: '300px' }}>
+      <ResponsiveContainer width="100%" height={300}>
+      <LineChart data={chartData} margin={{ top: 10, right: 30, left: 20, bottom: 60 }}>
+        <CartesianGrid strokeDasharray="3 3" />
         <XAxis
           dataKey="date"
-          stroke="#6b7280"
-          style={{ fontSize: '12px' }}
           angle={-45}
           textAnchor="end"
           height={80}
         />
         <YAxis
-          stroke="#6b7280"
-          style={{ fontSize: '12px' }}
           tickFormatter={(value) => formatCurrency(value, currency as Currency)}
         />
         <Tooltip
           formatter={(value: number | undefined) => 
             value !== undefined ? formatCurrency(value, currency as Currency) : ''
           }
-          contentStyle={{
-            backgroundColor: 'white',
-            border: '1px solid #e5e7eb',
-            borderRadius: '8px',
-          }}
         />
         <Legend />
         <Line
@@ -105,6 +97,7 @@ const ExpenseSineChart = ({ transactions, currency = 'VND' }: ExpenseSineChartPr
         />
       </LineChart>
     </ResponsiveContainer>
+    </div>
   );
 };
 

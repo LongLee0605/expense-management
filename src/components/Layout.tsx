@@ -13,9 +13,9 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="min-h-screen bg-gray-50 pb-24 sm:pb-20">
       <header className="bg-white shadow-sm sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-3 md:py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+            <h1 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 truncate">
               💰 Quản Lý Chi Tiêu
             </h1>
             {user && (
@@ -35,16 +35,17 @@ const Layout = ({ children }: LayoutProps) => {
                 <Button
                   onClick={logout}
                   variant="secondary"
-                  className="text-sm"
+                  className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2"
                 >
-                  Đăng xuất
+                  <span className="hidden sm:inline">Đăng xuất</span>
+                  <span className="sm:hidden">Thoát</span>
                 </Button>
               </div>
             )}
           </div>
         </div>
       </header>
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 md:py-6">
         {children}
       </main>
       <Navigation />
