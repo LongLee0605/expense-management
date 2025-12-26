@@ -43,10 +43,10 @@ const DashboardPage = () => {
   };
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-4 sm:space-y-6 pb-20">
       <InstallPrompt />
       <QuickAddTransaction />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         <StatCard
           title="Tổng thu"
           amount={totalIncome}
@@ -70,20 +70,20 @@ const DashboardPage = () => {
       {insights.length > 0 && <SmartInsightsWidget insights={insights} />}
       {monthlyComparison.thisMonth.total > 0 && (
         <Card>
-          <h2 className="text-xl font-semibold mb-4">📊 So sánh tháng này vs tháng trước</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <p className="text-sm text-gray-600 mb-1">Tháng này</p>
-              <p className="text-2xl font-bold text-blue-700">
+          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">📊 So sánh tháng này vs tháng trước</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="bg-blue-50 p-3 sm:p-4 rounded-lg">
+              <p className="text-xs sm:text-sm text-gray-600 mb-1">Tháng này</p>
+              <p className="text-xl sm:text-2xl font-bold text-blue-700 break-words">
                 {formatCurrency(monthlyComparison.thisMonth.total, (transactions[0]?.currency || 'VND') as Currency)}
               </p>
               <p className="text-xs text-gray-500 mt-1">
                 {monthlyComparison.thisMonth.count} giao dịch
               </p>
             </div>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-sm text-gray-600 mb-1">Tháng trước</p>
-              <p className="text-2xl font-bold text-gray-700">
+            <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
+              <p className="text-xs sm:text-sm text-gray-600 mb-1">Tháng trước</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-700 break-words">
                 {formatCurrency(monthlyComparison.lastMonth.total, (transactions[0]?.currency || 'VND') as Currency)}
               </p>
               <p className="text-xs text-gray-500 mt-1">
@@ -110,7 +110,7 @@ const DashboardPage = () => {
       {/* Top Categories */}
       {topCategories.length > 0 && (
         <Card>
-          <h2 className="text-xl font-semibold mb-4">🏆 Top danh mục chi tiêu</h2>
+          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">🏆 Top danh mục chi tiêu</h2>
           <div className="space-y-3">
             {topCategories.map((cat, index) => {
               const categoryInfo = EXPENSE_CATEGORIES.find(c => c.id === cat.category);
@@ -150,8 +150,8 @@ const DashboardPage = () => {
         <Card>
           <div className="flex justify-between items-center mb-4">
             <div>
-              <h2 className="text-xl font-semibold">Biểu đồ chi tiêu (Hình sin)</h2>
-              <p className="text-sm text-gray-600 mt-1">
+              <h2 className="text-lg sm:text-xl font-semibold">Biểu đồ chi tiêu (Hình sin)</h2>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1">
                 Phân tích chi tiêu với đường cong mượt mà
               </p>
             </div>
@@ -167,9 +167,9 @@ const DashboardPage = () => {
 
       {/* Bảng thu chi theo từng loại tiền */}
       <Card>
-        <h2 className="text-xl font-semibold mb-4">
-          Bảng thu chi theo loại tiền tệ
-        </h2>
+          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">
+            Bảng thu chi theo loại tiền tệ
+          </h2>
         <CurrencyBalanceTable
           incomeByCurrency={incomeByCurrency}
           expenseByCurrency={expenseByCurrency}
@@ -181,7 +181,7 @@ const DashboardPage = () => {
       {budgets.length > 0 && (
         <Card>
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Ngân sách</h2>
+            <h2 className="text-lg sm:text-xl font-semibold">Ngân sách</h2>
             <Link to="/budget">
               <Button variant="secondary" className="text-sm">
                 Xem tất cả
@@ -228,7 +228,7 @@ const DashboardPage = () => {
       {goals.length > 0 && (
         <Card>
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Mục tiêu</h2>
+            <h2 className="text-lg sm:text-xl font-semibold">Mục tiêu</h2>
             <Link to="/goals">
               <Button variant="secondary" className="text-sm">
                 Xem tất cả
@@ -261,7 +261,7 @@ const DashboardPage = () => {
 
       {/* Recent Transactions */}
       <Card>
-        <h2 className="text-xl font-semibold mb-4">Giao dịch gần đây</h2>
+          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Giao dịch gần đây</h2>
         {recentTransactions.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             <p className="text-lg mb-2">Chưa có giao dịch nào</p>
