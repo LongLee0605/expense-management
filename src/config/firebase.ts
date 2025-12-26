@@ -16,12 +16,10 @@ const firebaseConfig = {
 let app: FirebaseApp;
 try {
   app = initializeApp(firebaseConfig);
-  if (import.meta.env.DEV) {
-    console.log('✅ Firebase initialized successfully');
-    console.log('Project ID:', firebaseConfig.projectId);
-  }
 } catch (error) {
-  console.error('❌ Firebase initialization failed:', error);
+  if (import.meta.env.DEV) {
+    console.error('❌ Firebase initialization failed:', error);
+  }
   throw error;
 }
 
@@ -39,13 +37,7 @@ if (typeof window !== 'undefined') {
     if (supported) {
       try {
         analytics = getAnalytics(app);
-        if (import.meta.env.DEV) {
-          console.log('✅ Analytics initialized');
-        }
       } catch (error) {
-        if (import.meta.env.DEV) {
-          console.warn('⚠️ Analytics initialization failed:', error);
-        }
       }
     }
   }).catch(() => {
