@@ -1,9 +1,8 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getAnalytics, isSupported } from 'firebase/analytics';
+import { initializeApp, FirebaseApp } from 'firebase/app';
+import { getAuth, Auth, GoogleAuthProvider } from 'firebase/auth';
+import { getFirestore, Firestore } from 'firebase/firestore';
+import { getAnalytics, Analytics, isSupported } from 'firebase/analytics';
 
-// Firebase configuration
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyDXRqDobUbyx7B3BpcmhsVHC8F9zCHzt9g',
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'expense-management-d4e92.firebaseapp.com',
@@ -14,24 +13,39 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || 'G-8K30LRSLCC',
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+let app: FirebaseApp;
+try {
+  app = initializeApp(firebaseConfig);
+  if (import.meta.env.DEV) {
+    console.log('✅ Firebase initialized successfully');
+    console.log('Project ID:', firebaseConfig.projectId);
+  }
+} catch (error) {
+  console.error('❌ Firebase initialization failed:', error);
+  throw error;
+}
 
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const googleProvider = new GoogleAuthProvider();
+export const auth: Auth = getAuth(app);
+export const db: Firestore = getFirestore(app);
+export const googleProvider: GoogleAuthProvider = new GoogleAuthProvider();
 
 googleProvider.setCustomParameters({
   prompt: 'select_account',
 });
 
-let analytics: ReturnType<typeof getAnalytics> | null = null;
+let analytics: Analytics | null = null;
 if (typeof window !== 'undefined') {
   isSupported().then((supported) => {
     if (supported) {
       try {
         analytics = getAnalytics(app);
-      } catch {
+        if (import.meta.env.DEV) {
+          console.log('✅ Analytics initialized');
+        }
+      } catch (error) {
+        if (import.meta.env.DEV) {
+          console.warn('⚠️ Analytics initialization failed:', error);
+        }
       }
     }
   }).catch(() => {

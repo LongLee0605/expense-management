@@ -34,7 +34,7 @@ const AddTransactionPage = () => {
 
   const categories = type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!formData.amount || !formData.category) {
@@ -54,9 +54,15 @@ const AddTransactionPage = () => {
       notes: formData.notes || undefined,
     };
 
-    addTransaction(transaction);
-    showSuccess('Thêm giao dịch thành công!');
-    navigate('/transactions');
+    try {
+      await addTransaction(transaction);
+      showSuccess('Thêm giao dịch thành công!');
+      navigate('/transactions');
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Lỗi khi thêm giao dịch. Vui lòng thử lại.';
+      console.error('[Add Transaction Page Error]', error);
+      showError(errorMessage);
+    }
   };
 
   return (
@@ -64,7 +70,6 @@ const AddTransactionPage = () => {
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-2xl font-bold mb-6">Thêm giao dịch mới</h2>
 
-        {/* Type Selector */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Loại giao dịch
@@ -102,7 +107,6 @@ const AddTransactionPage = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Currency */}
           <div>
             <label
               htmlFor="currency"
@@ -116,7 +120,6 @@ const AddTransactionPage = () => {
               value={formData.currency}
               onChange={(e) => {
                 const newCurrency = e.target.value as Currency;
-                // Format lại amount khi đổi currency
                 if (formData.amount) {
                   const currentAmount = parseCurrencyInput(formData.amount, formData.currency);
                   const formattedAmount = formatCurrencyInput(currentAmount.toString(), newCurrency);
@@ -135,7 +138,6 @@ const AddTransactionPage = () => {
             </select>
           </div>
 
-          {/* Amount */}
           <div>
             <label
               htmlFor="amount"
@@ -165,7 +167,6 @@ const AddTransactionPage = () => {
             </p>
           </div>
 
-          {/* Category */}
           <div>
             <label
               htmlFor="category"
@@ -191,7 +192,6 @@ const AddTransactionPage = () => {
             </select>
           </div>
 
-          {/* Description */}
           <div>
             <label
               htmlFor="description"
@@ -211,7 +211,6 @@ const AddTransactionPage = () => {
             />
           </div>
 
-          {/* Date */}
           <div>
             <label
               htmlFor="date"
@@ -231,7 +230,6 @@ const AddTransactionPage = () => {
             />
           </div>
 
-          {/* Tags */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Tags
@@ -296,7 +294,6 @@ const AddTransactionPage = () => {
             </div>
           </div>
 
-          {/* Notes */}
           <div>
             <label
               htmlFor="notes"
@@ -316,7 +313,6 @@ const AddTransactionPage = () => {
             />
           </div>
 
-          {/* Submit Button */}
           <div className="flex space-x-4">
             <Button
               type="button"

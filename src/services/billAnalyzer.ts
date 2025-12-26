@@ -8,36 +8,20 @@ interface BillAnalysisResult {
   description: string;
   date: string;
   confidence: number;
-  billType?: string; // Loại bill: restaurant, supermarket, gas_station, etc.
-  merchantName?: string; // Tên cửa hàng/merchant
+  billType?: string;
+  merchantName?: string;
 }
 
-/**
- * Phân tích text từ bill để extract thông tin
- */
 export const analyzeBillText = (text: string): BillAnalysisResult => {
   const normalizedText = text.toLowerCase();
   const originalText = text;
   
-  // Extract số tiền (sử dụng cả normalized và original để tìm pattern tốt hơn)
   const { amount, amountPosition } = extractAmount(normalizedText, originalText);
-  
-  // Extract currency (sử dụng cả normalized và original để tìm tốt hơn, với vị trí số tiền)
   const currency = extractCurrency(normalizedText, originalText, amount, amountPosition);
-  
-  // Nhận diện loại bill và merchant name
   const { billType, merchantName } = identifyBillType(originalText, normalizedText);
-  
-  // Phân loại danh mục dựa trên keywords và bill type
   const category = categorizeBill(normalizedText, billType);
-  
-  // Extract ngày
   const date = extractDate(normalizedText) || getTodayDate();
-  
-  // Tạo description từ merchant name hoặc text
   const description = extractDescription(originalText, category, merchantName);
-  
-  // Tính confidence score
   const confidence = calculateConfidence(amount, category, date, billType);
   
   return {
@@ -52,52 +36,34 @@ export const analyzeBillText = (text: string): BillAnalysisResult => {
   };
 };
 
-/**
- * Extract số tiền từ text với nhiều pattern hơn (cải thiện đáng kể)
- * Trả về cả số tiền và vị trí của nó trong text
- */
 const extractAmount = (_normalizedText: string, originalText: string): { amount: number; amountPosition: number } => {
   const foundAmounts: Array<{ amount: number; priority: number; position: number; currency?: string }> = [];
   const lines = originalText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
 
-  // Helper function để parse số tiền từ string
   const parseAmount = (amountStr: string): number | null => {
     if (!amountStr) return null;
     
-    // Loại bỏ tất cả ký tự không phải số, dấu chấm, phẩy, khoảng trắng
     let cleanStr = amountStr.replace(/[^\d.,\s]/g, '');
     
-    // Xử lý các format khác nhau
-    // Format VN: 1.000.000 hoặc 1,000,000 hoặc 1 000 000
     if (/[\d]{1,3}[.,\s][\d]{3}[.,\s][\d]{3}/.test(cleanStr)) {
-      // Format có dấu phân cách hàng nghìn
       cleanStr = cleanStr.replace(/[.,\s]/g, '');
     } else if (/[\d]{1,3}[.,][\d]{3}/.test(cleanStr)) {
-      // Format có thể là số thập phân hoặc hàng nghìn
-      // Nếu có 2 chữ số sau dấu chấm/phẩy cuối, coi là số thập phân
       const parts = cleanStr.split(/[.,]/);
       if (parts.length === 2 && parts[1].length <= 2) {
-        // Số thập phân (ví dụ: 1.50 hoặc 1,50)
         cleanStr = cleanStr.replace(/[.,]/g, '');
       } else {
-        // Hàng nghìn
         cleanStr = cleanStr.replace(/[.,\s]/g, '');
       }
     } else {
-      // Chỉ có số, loại bỏ dấu chấm, phẩy, khoảng trắng
       cleanStr = cleanStr.replace(/[.,\s]/g, '');
     }
 
     const number = parseInt(cleanStr, 10);
-    // Validate: số tiền hợp lý từ 1,000 đến 1 tỷ
     if (!isNaN(number) && number >= 1000 && number < 1000000000) {
       return number;
     }
     return null;
   };
-
-  // 1. Tìm số tiền ngay sau các từ khóa quan trọng - Priority CAO NHẤT
-  // Pattern: từ khóa + số tiền (trong vòng 30 ký tự)
   const totalKeywords = [
     'tổng', 'total', 'thanh toán', 'payment', 'paid', 'tổng cộng', 'tổng tiền',
     'thành tiền', 'cộng tiền', 'grand total', 'tổng thanh toán', 'tổng giá trị',

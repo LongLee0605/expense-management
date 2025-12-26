@@ -1,9 +1,6 @@
 import { Expense } from '../types';
 import { formatCurrency } from './currency';
 
-/**
- * Tính toán insights thông minh từ giao dịch
- */
 export interface SpendingInsight {
   type: 'warning' | 'info' | 'success' | 'tip';
   title: string;

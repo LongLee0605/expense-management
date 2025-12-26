@@ -24,7 +24,7 @@ const QuickAddTransaction = ({ onSuccess }: QuickAddTransactionProps) => {
 
   const categories = type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     
     if (!formData.amount || !formData.category) {
@@ -42,18 +42,23 @@ const QuickAddTransaction = ({ onSuccess }: QuickAddTransactionProps) => {
       type,
     };
 
-    addTransaction(transaction);
-    showSuccess('Thêm giao dịch thành công!');
-    
-    // Reset form
-    setFormData({
-      amount: '',
-      currency: 'VND',
-      category: '',
-      description: '',
-    });
-    setIsOpen(false);
-    onSuccess?.();
+    try {
+      await addTransaction(transaction);
+      showSuccess('Thêm giao dịch thành công!');
+      
+      setFormData({
+        amount: '',
+        currency: 'VND',
+        category: '',
+        description: '',
+      });
+      setIsOpen(false);
+      onSuccess?.();
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Lỗi khi thêm giao dịch. Vui lòng thử lại.';
+      console.error('[Quick Add Transaction Error]', error);
+      showError(errorMessage);
+    }
   };
 
   if (!isOpen) {

@@ -35,21 +35,35 @@ export const useTransactions = () => {
   }, [user]);
   const addTransaction = useCallback(
     async (transaction: Expense) => {
-      if (!user) return;
+      if (!user || !user.uid) {
+        throw new Error('Bạn cần đăng nhập để thêm giao dịch');
+      }
       
       try {
         await transactionsService.add(user.uid, transaction);
       } catch (error: any) {
-        if (error?.code !== 'permission-denied') {
+        console.error('[Add Transaction Error]', error);
+        
+        if (error?.code === 'permission-denied') {
+          throw new Error('Không có quyền thêm giao dịch. Vui lòng kiểm tra Firestore Rules trong Firebase Console.');
         }
+        
+        if (error?.code === 'unavailable') {
+          console.warn('[Firebase Unavailable] Falling back to localStorage');
+          storageService.addTransaction(transaction);
+          setTransactions((prev) => [...prev, transaction]);
+          return;
+        }
+        
+        console.warn('[Firebase Error] Falling back to localStorage', error);
         storageService.addTransaction(transaction);
         setTransactions((prev) => [...prev, transaction]);
+        throw new Error('Lỗi kết nối Firebase. Dữ liệu đã được lưu tạm vào localStorage.');
       }
     },
     [user]
   );
 
-  // Xóa giao dịch
   const deleteTransaction = useCallback(
     async (id: string) => {
       if (!user) return;
@@ -66,7 +80,6 @@ export const useTransactions = () => {
     [user]
   );
 
-  // Cập nhật giao dịch
   const updateTransaction = useCallback(
     async (id: string, updatedTransaction: Expense) => {
       if (!user) return;

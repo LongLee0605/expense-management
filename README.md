@@ -144,13 +144,120 @@ Chạy ESLint để kiểm tra code:
 npm run lint
 ```
 
-## 🚀 Deploy
+## 🚀 Deploy lên Vercel
 
-Sau khi build, thư mục `dist/` chứa các file production-ready có thể deploy lên bất kỳ static hosting nào như:
-- Vercel
-- Netlify
-- GitHub Pages
-- Firebase Hosting
+### Cách 1: Deploy qua Vercel Dashboard
+
+1. **Đẩy code lên GitHub:**
+   ```bash
+   git add .
+   git commit -m "Prepare for Vercel deployment"
+   git push origin main
+   ```
+
+2. **Kết nối với Vercel:**
+   - Truy cập [Vercel Dashboard](https://vercel.com/dashboard)
+   - Click **"Add New Project"**
+   - Import repository từ GitHub
+   - Vercel sẽ tự động phát hiện Vite project
+
+3. **Cấu hình Environment Variables:**
+   Trong Vercel Dashboard, vào **Settings** > **Environment Variables** và thêm các biến sau:
+
+   ```
+   VITE_FIREBASE_API_KEY=your-api-key-here
+   VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+   VITE_FIREBASE_PROJECT_ID=your-project-id
+   VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+   VITE_FIREBASE_MESSAGING_SENDER_ID=123456789
+   VITE_FIREBASE_APP_ID=your-app-id
+   VITE_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX
+   VITE_OCR_SPACE_API_KEY=your-ocr-api-key-here
+   ```
+
+4. **Cấu hình Firebase Authorized Domains:**
+   - Vào [Firebase Console](https://console.firebase.google.com/)
+   - Chọn project của bạn
+   - Vào **Authentication** > **Settings** > **Authorized domains**
+   - Thêm domain của Vercel (ví dụ: `your-project.vercel.app`)
+
+5. **Deploy:**
+   - Click **"Deploy"** trong Vercel Dashboard
+   - Vercel sẽ tự động build và deploy ứng dụng
+
+### Cách 2: Deploy qua Vercel CLI
+
+1. **Cài đặt Vercel CLI:**
+   ```bash
+   npm i -g vercel
+   ```
+
+2. **Login vào Vercel:**
+   ```bash
+   vercel login
+   ```
+
+3. **Deploy:**
+   ```bash
+   vercel
+   ```
+
+4. **Thêm Environment Variables:**
+   ```bash
+   vercel env add VITE_FIREBASE_API_KEY
+   vercel env add VITE_FIREBASE_AUTH_DOMAIN
+   vercel env add VITE_FIREBASE_PROJECT_ID
+   vercel env add VITE_FIREBASE_STORAGE_BUCKET
+   vercel env add VITE_FIREBASE_MESSAGING_SENDER_ID
+   vercel env add VITE_FIREBASE_APP_ID
+   vercel env add VITE_FIREBASE_MEASUREMENT_ID
+   vercel env add VITE_OCR_SPACE_API_KEY
+   ```
+
+5. **Redeploy với environment variables:**
+   ```bash
+   vercel --prod
+   ```
+
+### Cấu hình Vercel
+
+File `vercel.json` đã được tạo sẵn với các cấu hình:
+- **Build Command:** `npm run build`
+- **Output Directory:** `dist`
+- **Framework:** Vite (tự động phát hiện)
+- **SPA Routing:** Tất cả routes được rewrite về `/index.html`
+- **PWA Support:** Service Worker được cấu hình đúng cache headers
+
+### Lưu ý quan trọng:
+
+1. **Firebase Authorized Domains:**
+   - Sau khi deploy, thêm domain Vercel vào Firebase Authorized Domains
+   - Format: `your-project.vercel.app` hoặc custom domain nếu có
+
+2. **Environment Variables:**
+   - Tất cả biến môi trường phải có prefix `VITE_` để Vite có thể truy cập
+   - Các biến này sẽ được embed vào code khi build
+
+3. **Firestore Rules:**
+   - Đảm bảo Firestore Rules cho phép đọc/ghi dữ liệu từ domain Vercel
+   - Ví dụ rule cơ bản:
+   ```javascript
+   rules_version = '2';
+   service cloud.firestore {
+     match /databases/{database}/documents {
+       match /users/{userId}/{document=**} {
+         allow read, write: if request.auth != null && request.auth.uid == userId;
+       }
+     }
+   }
+   ```
+
+## 🚀 Deploy lên các platform khác
+
+Sau khi build, thư mục `dist/` chứa các file production-ready có thể deploy lên:
+- **Netlify** - Tương tự Vercel, thêm environment variables trong Netlify Dashboard
+- **GitHub Pages** - Sử dụng GitHub Actions để build và deploy
+- **Firebase Hosting** - `firebase deploy --only hosting`
 
 ## 📄 License
 

@@ -75,9 +75,6 @@ const preprocessImage = async (imageFile: File): Promise<File> => {
   });
 };
 
-/**
- * Chuyển đổi File thành base64 string
- */
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();

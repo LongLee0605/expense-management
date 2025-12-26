@@ -13,30 +13,23 @@ const InstallPrompt = () => {
   const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
-    // Check if app is already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
       setIsInstalled(true);
       return;
     }
 
-    // Check if app is installed on iOS
     if ((window.navigator as any).standalone === true) {
       setIsInstalled(true);
       return;
     }
 
-    // Luôn hiển thị prompt nếu chưa cài đặt (trên Dashboard)
     setShowPrompt(true);
-
-    // Listen for beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    // Listen for app installed event
     window.addEventListener('appinstalled', () => {
       setIsInstalled(true);
       setShowPrompt(false);
@@ -50,7 +43,6 @@ const InstallPrompt = () => {
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) {
-      // For iOS, instructions are already shown in UI
       return;
     }
 

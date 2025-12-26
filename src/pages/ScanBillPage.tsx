@@ -122,7 +122,6 @@ const ScanBillPage = () => {
       setAnalysisResult(analysis);
       setExtractedText(editableText);
 
-      // Điền form với kết quả phân tích mới - đảm bảo currency được set đúng
       const detectedCurrency = analysis.currency || 'VND';
       setFormData({
         amount: formatCurrencyInput(analysis.amount.toString(), detectedCurrency),
@@ -139,7 +138,7 @@ const ScanBillPage = () => {
     }
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     try {
@@ -165,15 +164,16 @@ const ScanBillPage = () => {
         notes: extractedText ? `Text từ bill: ${extractedText.substring(0, 300)}...` : undefined,
       };
 
-      addTransaction(transaction);
+      await addTransaction(transaction);
       showSuccess('Thêm giao dịch từ bill thành công!');
       navigate('/transactions');
-    } catch (error) {
-      showError('Lỗi khi lưu giao dịch: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Lỗi khi lưu giao dịch. Vui lòng thử lại.';
+      console.error('[Scan Bill Submit Error]', error);
+      showError(errorMessage);
     }
   };
 
-  // Tự động lưu nếu confidence cao và có đủ thông tin
   const handleAutoSave = () => {
     try {
       if (!analysisResult) {
@@ -224,7 +224,6 @@ const ScanBillPage = () => {
         </p>
       </div>
 
-      {/* Upload Image */}
       <Card>
         <h3 className="text-lg font-semibold mb-4">1. Upload ảnh hóa đơn</h3>
         <ImageUpload
@@ -246,7 +245,6 @@ const ScanBillPage = () => {
         )}
       </Card>
 
-      {/* Scan Button */}
       {imageFile && !analysisResult && (
         <Card>
           <Button
@@ -277,7 +275,6 @@ const ScanBillPage = () => {
         </Card>
       )}
 
-      {/* Extracted Text - Editable */}
       {extractedText && (
         <Card>
           <div className="flex justify-between items-center mb-2">
@@ -334,7 +331,6 @@ const ScanBillPage = () => {
         </Card>
       )}
 
-      {/* Analysis Result */}
       {analysisResult && (
         <Card>
           <div className="mb-4">
@@ -440,7 +436,6 @@ const ScanBillPage = () => {
         </Card>
       )}
 
-      {/* Form để chỉnh sửa */}
       {analysisResult && (
         <Card>
           <h3 className="text-lg font-semibold mb-4">2. Xác nhận và chỉnh sửa thông tin</h3>
@@ -558,7 +553,6 @@ const ScanBillPage = () => {
         </Card>
       )}
 
-      {/* Image Modal */}
       {showImageModal && imagePreview && (
         <div
           className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
@@ -582,7 +576,6 @@ const ScanBillPage = () => {
         </div>
       )}
 
-      {/* Quick Actions - Copy Amount & Description */}
       {analysisResult && analysisResult.amount > 0 && (
         <Card>
           <h3 className="text-lg font-semibold mb-3">Thao tác nhanh</h3>

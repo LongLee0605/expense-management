@@ -9,14 +9,11 @@ interface ExpenseSineChartProps {
 }
 
 const ExpenseSineChart = ({ transactions, currency = 'VND' }: ExpenseSineChartProps) => {
-  // Tính toán dữ liệu chi tiêu theo ngày và tạo biểu đồ hình sin
   const chartData = useMemo(() => {
-    // Lọc giao dịch chi tiêu và cùng loại tiền
     const expenses = transactions.filter(
       (t) => t.type === 'expense' && t.currency === currency
     );
 
-    // Nhóm theo ngày
     const dailyExpenses = new Map<string, number>();
     expenses.forEach((expense) => {
       const date = expense.date;
@@ -24,17 +21,13 @@ const ExpenseSineChart = ({ transactions, currency = 'VND' }: ExpenseSineChartPr
       dailyExpenses.set(date, current + expense.amount);
     });
 
-    // Sắp xếp theo ngày
     const sortedDates = Array.from(dailyExpenses.entries())
       .map(([date, amount]) => ({ date, amount }))
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
-    // Tạo dữ liệu cho biểu đồ hình sin
-    // Sử dụng hàm sin để tạo đường cong mượt mà
     const maxAmount = Math.max(...sortedDates.map((d) => d.amount), 1);
     const data = sortedDates.map((item, index) => {
       const x = (index / Math.max(sortedDates.length - 1, 1)) * Math.PI * 2;
-      const sineValue = Math.sin(x) * (maxAmount * 0.3); // Độ sâu của sóng
+      const sineValue = Math.sin(x) * (maxAmount * 0.3);
       const smoothedAmount = item.amount + sineValue;
 
       return {

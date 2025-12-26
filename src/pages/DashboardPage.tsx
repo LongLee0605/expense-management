@@ -44,13 +44,8 @@ const DashboardPage = () => {
 
   return (
     <div className="space-y-6 pb-20">
-      {/* Install PWA Prompt */}
       <InstallPrompt />
-
-      {/* Quick Add Transaction */}
       <QuickAddTransaction />
-
-      {/* Stat Cards - Tổng quan */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatCard
           title="Tổng thu"
@@ -72,10 +67,7 @@ const DashboardPage = () => {
         />
       </div>
 
-      {/* Smart Insights */}
       {insights.length > 0 && <SmartInsightsWidget insights={insights} />}
-
-      {/* Monthly Comparison */}
       {monthlyComparison.thisMonth.total > 0 && (
         <Card>
           <h2 className="text-xl font-semibold mb-4">📊 So sánh tháng này vs tháng trước</h2>

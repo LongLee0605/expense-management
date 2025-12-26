@@ -95,7 +95,6 @@ export const useBudgets = (transactions: Expense[]) => {
         periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
         periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
       } else {
-        // yearly
         periodStart = new Date(now.getFullYear(), 0, 1);
         periodEnd = new Date(now.getFullYear(), 11, 31);
       }
