@@ -7,6 +7,7 @@ import {
   Button,
   SmartInsightsWidget,
   QuickAddTransaction,
+  InstallPrompt,
 } from '../components';
 import { Expense } from '../types';
 import { Link, useNavigate } from 'react-router-dom';
@@ -29,18 +30,12 @@ const DashboardPage = () => {
   const { budgets, getBudgetStatus } = useBudgets(transactions);
   const { goals } = useGoals();
 
-  // Lấy 5 giao dịch gần nhất
   const recentTransactions = [...transactions]
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5);
 
-  // Generate smart insights
   const insights = generateSmartInsights(transactions);
-  
-  // Monthly comparison
   const monthlyComparison = compareMonthlySpending(transactions);
-  
-  // Top categories
   const topCategories = getTopCategories(transactions, 5);
 
   const handleEdit = (transaction: Expense) => {
@@ -49,6 +44,9 @@ const DashboardPage = () => {
 
   return (
     <div className="space-y-6 pb-20">
+      {/* Install PWA Prompt */}
+      <InstallPrompt />
+
       {/* Quick Add Transaction */}
       <QuickAddTransaction />
 

@@ -101,7 +101,6 @@ const ScanBillPage = () => {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       
       if (import.meta.env.DEV) {
-        console.error('[Scan Bill Error]', error);
       }
       
       showError('Lỗi khi quét bill: ' + errorMessage);

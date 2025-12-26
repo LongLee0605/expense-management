@@ -1,23 +1,7 @@
-/**
- * OCR Service sử dụng OCR.space API
- * OCR.space cung cấp độ chính xác cao hơn Tesseract.js và hỗ trợ tốt cho tiếng Việt
- * 
- * FREE TIER: 25,000 requests/tháng (hoàn toàn miễn phí, không cần credit card)
- * - Không có API key: ~1,000 requests/tháng
- * - Có free API key: 25,000 requests/tháng
- * 
- * Lấy free API key tại: https://ocr.space/ocrapi/freekey
- * (Chỉ cần email, không cần credit card, hoàn toàn miễn phí)
- */
 
 const OCR_SPACE_API_URL = 'https://api.ocr.space/parse/image';
-// API key mặc định hoặc từ environment variable
-// Lấy free API key tại: https://ocr.space/ocrapi/freekey (hoàn toàn miễn phí)
 const OCR_SPACE_API_KEY = import.meta.env.VITE_OCR_SPACE_API_KEY || 'K89790724088957';
 
-/**
- * Tiền xử lý ảnh để cải thiện độ chính xác OCR
- */
 const preprocessImage = async (imageFile: File): Promise<File> => {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -99,7 +83,6 @@ const fileToBase64 = (file: File): Promise<string> => {
     const reader = new FileReader();
     reader.onload = () => {
       const result = reader.result as string;
-      // Loại bỏ data URL prefix
       const base64 = result.split(',')[1];
       resolve(base64);
     };
@@ -108,13 +91,6 @@ const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
-/**
- * Trích xuất text từ ảnh sử dụng OCR.space API
- * @param imageFile - File ảnh cần OCR
- * @param onProgress - Callback để cập nhật tiến trình (0-100)
- * @param onStatus - Callback để cập nhật trạng thái
- * @returns Promise<string> - Text đã được trích xuất
- */
 export const extractTextFromImage = async (
   imageFile: File,
   onProgress?: (progress: number) => void,
@@ -132,27 +108,22 @@ export const extractTextFromImage = async (
     onStatus?.('Đang xử lý ảnh...');
     onProgress?.(10);
 
-    // Tiền xử lý ảnh để cải thiện độ chính xác
     const processedImage = await preprocessImage(imageFile);
     onProgress?.(30);
     onStatus?.('Đang chuẩn bị gửi đến OCR service...');
 
-    // Chuyển đổi ảnh sang base64
     const base64Image = await fileToBase64(processedImage);
     onProgress?.(50);
     onStatus?.('Đang nhận diện text...');
 
-    // Gọi OCR.space API
     const formData = new FormData();
-    formData.append('apikey', OCR_SPACE_API_KEY); // API key được gửi qua FormData
+    formData.append('apikey', OCR_SPACE_API_KEY);
     formData.append('base64Image', `data:image/png;base64,${base64Image}`);
-    // Sử dụng 'auto' để tự động nhận diện ngôn ngữ (Engine 2 hỗ trợ tốt)
-    // Hoặc có thể dùng 'vnm' cho tiếng Việt, 'eng' cho tiếng Anh
-    formData.append('language', 'auto'); // Tự động nhận diện ngôn ngữ (hỗ trợ tiếng Việt và tiếng Anh)
+    formData.append('language', 'auto');
     formData.append('isOverlayRequired', 'false');
     formData.append('detectOrientation', 'true');
     formData.append('scale', 'true');
-    formData.append('OCREngine', '2'); // Engine 2 hỗ trợ tiếng Việt và tự động nhận diện ngôn ngữ
+    formData.append('OCREngine', '2');
 
     onProgress?.(60);
     onStatus?.('Đang gửi request đến OCR service...');
@@ -172,13 +143,11 @@ export const extractTextFromImage = async (
 
     const result = await response.json();
 
-    // Kiểm tra lỗi từ API
     if (result.OCRExitCode !== 1) {
       const errorMessage = result.ErrorMessage?.[0] || 'Lỗi không xác định từ OCR service';
       throw new Error(`OCR failed: ${errorMessage}`);
     }
 
-    // Trích xuất text từ kết quả
     const parsedResults = result.ParsedResults;
     if (!parsedResults || parsedResults.length === 0) {
       throw new Error('Không tìm thấy text trong ảnh');
@@ -191,7 +160,6 @@ export const extractTextFromImage = async (
       }
     }
 
-    // Làm sạch text
     extractedText = extractedText
       .trim()
       .replace(/\s+/g, ' ')
@@ -207,13 +175,10 @@ export const extractTextFromImage = async (
 
     return extractedText;
   } catch (error) {
-    // Xử lý lỗi cụ thể
     if (error instanceof Error) {
-      // Kiểm tra nếu là lỗi network
       if (error.message.includes('fetch') || error.message.includes('network')) {
         throw new Error('Lỗi kết nối mạng. Vui lòng kiểm tra kết nối internet và thử lại.');
       }
-      // Kiểm tra nếu là lỗi API rate limit
       if (error.message.includes('429') || error.message.includes('rate limit')) {
         throw new Error('Đã vượt quá giới hạn requests. Vui lòng thử lại sau.');
       }

@@ -1,48 +1,90 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Expense, Currency } from '../types';
+import { transactionsService } from '../services/firebaseService';
+import { useAuth } from '../contexts/AuthContext';
 import { storageService } from '../services';
 
 export const useTransactions = () => {
   const [transactions, setTransactions] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
-  // Load transactions từ localStorage
   useEffect(() => {
-    const loadTransactions = () => {
-      const data = storageService.getTransactions();
-      // Migrate old data without currency to VND
+    if (!user || !user.uid) {
+      setTransactions([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    
+    const unsubscribe = transactionsService.subscribe(user.uid, (data) => {
       const migratedData = data.map((t) => ({
         ...t,
         currency: ('currency' in t ? t.currency : 'VND') as Currency,
       }));
       setTransactions(migratedData);
       setLoading(false);
+    });
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
     };
-
-    loadTransactions();
-  }, []);
-
-  // Thêm giao dịch mới
-  const addTransaction = useCallback((transaction: Expense) => {
-    storageService.addTransaction(transaction);
-    setTransactions((prev) => [...prev, transaction]);
-  }, []);
+  }, [user]);
+  const addTransaction = useCallback(
+    async (transaction: Expense) => {
+      if (!user) return;
+      
+      try {
+        await transactionsService.add(user.uid, transaction);
+      } catch (error: any) {
+        if (error?.code !== 'permission-denied') {
+        }
+        storageService.addTransaction(transaction);
+        setTransactions((prev) => [...prev, transaction]);
+      }
+    },
+    [user]
+  );
 
   // Xóa giao dịch
-  const deleteTransaction = useCallback((id: string) => {
-    storageService.deleteTransaction(id);
-    setTransactions((prev) => prev.filter((t) => t.id !== id));
-  }, []);
+  const deleteTransaction = useCallback(
+    async (id: string) => {
+      if (!user) return;
+      
+      try {
+        await transactionsService.delete(user.uid, id);
+      } catch (error: any) {
+        if (error?.code !== 'permission-denied') {
+        }
+        storageService.deleteTransaction(id);
+        setTransactions((prev) => prev.filter((t) => t.id !== id));
+      }
+    },
+    [user]
+  );
 
   // Cập nhật giao dịch
-  const updateTransaction = useCallback((id: string, updatedTransaction: Expense) => {
-    storageService.updateTransaction(id, updatedTransaction);
-    setTransactions((prev) =>
-      prev.map((t) => (t.id === id ? updatedTransaction : t))
-    );
-  }, []);
+  const updateTransaction = useCallback(
+    async (id: string, updatedTransaction: Expense) => {
+      if (!user) return;
+      
+      try {
+        await transactionsService.update(user.uid, id, updatedTransaction);
+      } catch (error: any) {
+        if (error?.code !== 'permission-denied') {
+        }
+        storageService.updateTransaction(id, updatedTransaction);
+        setTransactions((prev) =>
+          prev.map((t) => (t.id === id ? updatedTransaction : t))
+        );
+      }
+    },
+    [user]
+  );
 
-  // Tính tổng thu theo từng loại tiền
   const incomeByCurrency = useMemo(() => {
     const map = new Map<Currency, number>();
     transactions
@@ -54,7 +96,6 @@ export const useTransactions = () => {
     return map;
   }, [transactions]);
 
-  // Tính tổng chi theo từng loại tiền
   const expenseByCurrency = useMemo(() => {
     const map = new Map<Currency, number>();
     transactions
@@ -66,7 +107,6 @@ export const useTransactions = () => {
     return map;
   }, [transactions]);
 
-  // Tính số dư theo từng loại tiền
   const balanceByCurrency = useMemo(() => {
     const map = new Map<Currency, number>();
     const allCurrencies = new Set([
@@ -83,17 +123,14 @@ export const useTransactions = () => {
     return map;
   }, [incomeByCurrency, expenseByCurrency]);
 
-  // Tính tổng thu (tất cả loại tiền - chỉ để tương thích)
   const totalIncome = useMemo(() => {
     return Array.from(incomeByCurrency.values()).reduce((sum, val) => sum + val, 0);
   }, [incomeByCurrency]);
 
-  // Tính tổng chi (tất cả loại tiền - chỉ để tương thích)
   const totalExpense = useMemo(() => {
     return Array.from(expenseByCurrency.values()).reduce((sum, val) => sum + val, 0);
   }, [expenseByCurrency]);
 
-  // Số dư (tất cả loại tiền - chỉ để tương thích)
   const balance = totalIncome - totalExpense;
 
   return {

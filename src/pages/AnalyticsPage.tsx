@@ -19,17 +19,14 @@ const AnalyticsPage = () => {
     return transactions.filter((t) => t.currency === selectedCurrency);
   }, [transactions, selectedCurrency]);
 
-  // Tính toán metrics
   const metrics = useMemo(() => {
     return calculateFinancialMetrics(filteredTransactions);
   }, [filteredTransactions]);
 
-  // Tính toán xu hướng
   const trend = useMemo(() => {
     return calculateExpenseTrend(filteredTransactions, 30);
   }, [filteredTransactions]);
 
-  // Lấy danh sách currencies có trong transactions
   const availableCurrencies = useMemo(() => {
     const currencies = new Set(transactions.map((t) => t.currency));
     return Array.from(currencies);

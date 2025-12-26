@@ -4,12 +4,14 @@
 
 ## 🚀 Tính năng
 
-- Quản lý thu chi cá nhân và gia đình
-- Quét hóa đơn tự động bằng AI (Google Gemini) hoặc OCR (OCR.space API)
-- Progressive Web App (PWA) - có thể cài đặt trên mobile và desktop
-- Giao diện hiện đại với TailwindCSS
-- TypeScript để đảm bảo type safety
-- Cấu trúc code rõ ràng, dễ mở rộng
+- **Đăng nhập với Google** - Đồng bộ dữ liệu giữa các thiết bị
+- **Quản lý thu chi cá nhân và gia đình** - Theo dõi chi tiêu hiệu quả
+- **Quét hóa đơn tự động** - Sử dụng OCR.space API để trích xuất thông tin
+- **Progressive Web App (PWA)** - Có thể cài đặt trên mobile và desktop
+- **Đồng bộ real-time** - Dữ liệu tự động cập nhật qua Firebase Firestore
+- **Giao diện hiện đại** - Với TailwindCSS
+- **TypeScript** - Đảm bảo type safety
+- **Cấu trúc code rõ ràng** - Dễ mở rộng và bảo trì
 
 ## 📋 Yêu cầu
 
@@ -23,24 +25,35 @@
 npm install
 ```
 
-2. (Tùy chọn) Tạo file `.env` ở root directory để cấu hình API keys:
+2. **Bắt buộc** Tạo file `.env` ở root directory để cấu hình Firebase và API keys:
 
 ```bash
-# Groq API Key cho AI Vision (hoàn toàn miễn phí, không cần credit card)
-VITE_GROQ_API_KEY=your_groq_api_key_here
+# Firebase Configuration (BẮT BUỘC)
+# Lấy từ Firebase Console: https://console.firebase.google.com/
+# Project Settings > General > Your apps > Web app
+VITE_FIREBASE_API_KEY=your-api-key-here
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=123456789
+VITE_FIREBASE_APP_ID=your-app-id
 
-# OCR.space API Key (tùy chọn - nếu không có sẽ dùng free tier với giới hạn thấp hơn)
-VITE_OCR_SPACE_API_KEY=your_ocr_space_api_key_here
+# OCR.space API Key
+VITE_OCR_SPACE_API_KEY=K89790724088957
 ```
 
+**Hướng dẫn cấu hình Firebase:**
+
+1. Tạo project mới tại [Firebase Console](https://console.firebase.google.com/)
+2. Bật **Authentication** > **Sign-in method** > **Google** (Enable)
+3. Tạo **Firestore Database** (chế độ Production hoặc Test mode)
+4. Lấy config từ **Project Settings** > **General** > **Your apps** > **Web app**
+5. Copy các giá trị vào file `.env`
+
 **Lưu ý:**
-- Ứng dụng có thể hoạt động mà không cần API keys (sử dụng OCR.space free tier ~1,000 requests/tháng)
-- **Để có 25,000 requests/tháng miễn phí:** Lấy free API key tại https://ocr.space/ocrapi/freekey
-  - Chỉ cần email, không cần credit card
-  - Hoàn toàn miễn phí vĩnh viễn
-  - Thêm vào file `.env`: `VITE_OCR_SPACE_API_KEY=your_key_here`
-- Để lấy Groq API Key miễn phí: https://console.groq.com/
-- **Tất cả đều hoàn toàn miễn phí, không cần credit card!**
+- Firebase Authentication và Firestore là **BẮT BUỘC** để ứng dụng hoạt động
+- Firebase có free tier rộng rãi cho các dự án nhỏ
+- Dữ liệu sẽ được đồng bộ tự động giữa các thiết bị khi đăng nhập
 
 3. Chạy ứng dụng ở chế độ development:
 ```bash
@@ -87,8 +100,9 @@ expense-management/
 - **TailwindCSS** - Utility-first CSS framework
 - **React Router** - Client-side routing
 - **Vite PWA Plugin** - PWA support
-- **Groq API** - AI Vision cho quét hóa đơn (hoàn toàn miễn phí, không cần credit card)
-- **OCR.space API** - OCR service với độ chính xác cao, hỗ trợ tốt tiếng Việt (free tier: 25,000 requests/tháng)
+- **Firebase Authentication** - Đăng nhập với Google
+- **Firebase Firestore** - Database real-time để đồng bộ dữ liệu
+- **OCR.space API** - OCR service với độ chính xác cao, hỗ trợ tốt tiếng Việt
 
 ## 📱 PWA
 

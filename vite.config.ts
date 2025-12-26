@@ -15,6 +15,9 @@ export default defineConfig({
         theme_color: '#3b82f6',
         background_color: '#ffffff',
         display: 'standalone',
+        start_url: '/',
+        scope: '/',
+        orientation: 'portrait',
         icons: [
           {
             src: 'pwa-192x192.png',
@@ -34,10 +37,32 @@ export default defineConfig({
             type: 'image/svg+xml',
             purpose: 'any maskable'
           }
+        ],
+        categories: ['finance', 'productivity', 'utilities'],
+        screenshots: [],
+        shortcuts: [
+          {
+            name: 'Thêm giao dịch',
+            short_name: 'Thêm',
+            description: 'Thêm giao dịch mới',
+            url: '/add',
+            icons: [{ src: 'pwa-192x192.png', sizes: '192x192' }]
+          },
+          {
+            name: 'Quét hóa đơn',
+            short_name: 'Quét',
+            description: 'Quét hóa đơn tự động',
+            url: '/scan',
+            icons: [{ src: 'pwa-192x192.png', sizes: '192x192' }]
+          }
         ]
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg}']
+      },
+      devOptions: {
+        enabled: true,
+        type: 'module'
       }
     })
   ]
