@@ -5,7 +5,7 @@
 ## 🚀 Tính năng
 
 - Quản lý thu chi cá nhân và gia đình
-- Quét hóa đơn tự động bằng AI (Google Gemini) hoặc OCR (Tesseract.js)
+- Quét hóa đơn tự động bằng AI (Google Gemini) hoặc OCR (OCR.space API)
 - Progressive Web App (PWA) - có thể cài đặt trên mobile và desktop
 - Giao diện hiện đại với TailwindCSS
 - TypeScript để đảm bảo type safety
@@ -23,17 +23,24 @@
 npm install
 ```
 
-2. Tạo file `.env` ở root directory và thêm Groq API Key (hoàn toàn miễn phí, không cần credit card):
+2. (Tùy chọn) Tạo file `.env` ở root directory để cấu hình API keys:
+
 ```bash
+# Groq API Key cho AI Vision (hoàn toàn miễn phí, không cần credit card)
 VITE_GROQ_API_KEY=your_groq_api_key_here
+
+# OCR.space API Key (tùy chọn - nếu không có sẽ dùng free tier với giới hạn thấp hơn)
+VITE_OCR_SPACE_API_KEY=your_ocr_space_api_key_here
 ```
 
-Để lấy Groq API Key miễn phí:
-- Truy cập: https://console.groq.com/
-- Đăng ký tài khoản miễn phí (chỉ cần email)
-- Vào mục "API Keys" và tạo API key mới
-- Copy và paste vào file `.env`
-- **Hoàn toàn miễn phí, không cần credit card, free tier rất rộng rãi!**
+**Lưu ý:**
+- Ứng dụng có thể hoạt động mà không cần API keys (sử dụng OCR.space free tier ~1,000 requests/tháng)
+- **Để có 25,000 requests/tháng miễn phí:** Lấy free API key tại https://ocr.space/ocrapi/freekey
+  - Chỉ cần email, không cần credit card
+  - Hoàn toàn miễn phí vĩnh viễn
+  - Thêm vào file `.env`: `VITE_OCR_SPACE_API_KEY=your_key_here`
+- Để lấy Groq API Key miễn phí: https://console.groq.com/
+- **Tất cả đều hoàn toàn miễn phí, không cần credit card!**
 
 3. Chạy ứng dụng ở chế độ development:
 ```bash
@@ -81,7 +88,7 @@ expense-management/
 - **React Router** - Client-side routing
 - **Vite PWA Plugin** - PWA support
 - **Groq API** - AI Vision cho quét hóa đơn (hoàn toàn miễn phí, không cần credit card)
-- **Tesseract.js** - OCR fallback khi không có API key
+- **OCR.space API** - OCR service với độ chính xác cao, hỗ trợ tốt tiếng Việt (free tier: 25,000 requests/tháng)
 
 ## 📱 PWA
 

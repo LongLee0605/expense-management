@@ -96,7 +96,54 @@ const extractAmount = (_normalizedText: string, originalText: string): { amount:
     return null;
   };
 
-  // 1. Tìm số tiền kèm currency symbol trong cùng dòng - Priority cao nhất
+  // 1. Tìm số tiền ngay sau các từ khóa quan trọng - Priority CAO NHẤT
+  // Pattern: từ khóa + số tiền (trong vòng 30 ký tự)
+  const totalKeywords = [
+    'tổng', 'total', 'thanh toán', 'payment', 'paid', 'tổng cộng', 'tổng tiền',
+    'thành tiền', 'cộng tiền', 'grand total', 'tổng thanh toán', 'tổng giá trị',
+    'phải trả', 'phải thanh toán', 'cần trả', 'amount due', 'balance', 'final amount',
+    'tổng số tiền', 'tổng giá', 'tổng trị giá', 'tổng cộng tiền', 'tổng thanh toán',
+    'số tiền phải trả', 'tiền thanh toán', 'tiền phải trả'
+  ];
+  
+  for (const keyword of totalKeywords) {
+    const keywordRegex = new RegExp(keyword.replace(/\s+/g, '\\s+'), 'gi');
+    const matches = originalText.matchAll(keywordRegex);
+    
+    for (const match of matches) {
+      const keywordEnd = (match.index || 0) + match[0].length;
+      const searchStart = keywordEnd;
+      const searchEnd = Math.min(originalText.length, keywordEnd + 50); // Tìm trong vòng 50 ký tự sau từ khóa
+      const context = originalText.substring(searchStart, searchEnd);
+      
+      // Pattern tìm số tiền ngay sau từ khóa
+      const amountPatterns = [
+        /[\s:]*([\d.,\s]{4,})\s*(?:₫|vnđ|vnd|đồng|đ|dong|usd|\$|eur|€|jpy|¥|gbp|£|cny)/i, // Có currency
+        /[\s:]*([\d.,\s]{6,})/i, // Số tiền lớn (ít nhất 6 ký tự)
+      ];
+      
+      for (const pattern of amountPatterns) {
+        const amountMatch = context.match(pattern);
+        if (amountMatch && amountMatch[1]) {
+          const amount = parseAmount(amountMatch[1]);
+          if (amount && amount >= 10000) {
+            const amountPosition = searchStart + (amountMatch.index || 0);
+            // Priority rất cao: 50 + bonus nếu có currency
+            const priority = amountMatch[0].match(/₫|vnđ|vnd|đ|usd|\$|eur|€|jpy|¥|gbp|£|cny/i) ? 55 : 50;
+            foundAmounts.push({
+              amount,
+              priority,
+              position: amountPosition,
+              currency: context.match(/₫|vnđ|vnd|đồng|đ/i) ? 'VND' : undefined
+            });
+            break; // Chỉ lấy số đầu tiên sau từ khóa
+          }
+        }
+      }
+    }
+  }
+
+  // 2. Tìm số tiền kèm currency symbol trong cùng dòng - Priority cao
   // Pattern: số tiền + ký hiệu currency (₫, $, €, etc.)
   const amountWithCurrencyPatterns = [
     /([\d.,\s]{4,})\s*₫/gu, // 151.000₫, 105.000₫
@@ -119,7 +166,7 @@ const extractAmount = (_normalizedText: string, originalText: string): { amount:
             const matchIndex = line.indexOf(match[0]);
             foundAmounts.push({ 
               amount, 
-              priority: 30, // Priority rất cao vì có currency symbol
+              priority: 35, // Priority cao vì có currency symbol
               position: lineIndex + matchIndex,
               currency: line.includes('₫') || line.match(/vnđ|vnd|đồng|đ/i) ? 'VND' : undefined
             });
@@ -129,27 +176,30 @@ const extractAmount = (_normalizedText: string, originalText: string): { amount:
     }
   }
 
-  // 2. Tìm số tiền ở cuối bill (thường là tổng tiền) - Priority cao
-  const lastLines = lines.slice(-5); // 5 dòng cuối
+  // 3. Tìm số tiền ở cuối bill (thường là tổng tiền) - Priority trung bình-cao
+  const lastLines = lines.slice(-8); // 8 dòng cuối
   for (let i = lastLines.length - 1; i >= 0; i--) {
     const line = lastLines[i];
     
-    // Pattern với từ khóa tổng/total ở cuối bill
+    // Pattern với từ khóa tổng/total ở cuối bill - cải thiện pattern
     const totalPatterns = [
-      /(?:tổng|total|thanh\s+toán|payment|tổng\s+cộng|tổng\s+tiền|thành\s+tiền|cộng\s+tiền|grand\s+total)[\s:]*([\d.,\s]+)/i,
-      /([\d.,\s]+)\s*(?:vnđ|vnd|đ|dong|usd|\$|eur|€|jpy|¥|gbp|£|cny)/i,
+      /(?:tổng|total|thanh\s+toán|payment|tổng\s+cộng|tổng\s+tiền|thành\s+tiền|cộng\s+tiền|grand\s+total|tổng\s+thanh\s+toán|tổng\s+giá\s+trị)[\s:]*([\d.,\s]+)/i,
+      /([\d.,\s]{6,})\s*(?:vnđ|vnd|đ|dong|usd|\$|eur|€|jpy|¥|gbp|£|cny)/i, // Ít nhất 6 ký tự số
+      /(?:phải\s+trả|phải\s+thanh\s+toán|cần\s+trả)[\s:]*([\d.,\s]+)/i,
     ];
 
     for (const pattern of totalPatterns) {
       const match = line.match(pattern);
       if (match && match[1]) {
         const amount = parseAmount(match[1]);
-        if (amount) {
+        if (amount && amount >= 10000) { // Chỉ lấy số >= 10,000
           const lineIndex = originalText.indexOf(line);
           const matchIndex = line.indexOf(match[0]);
+          // Tăng priority cho dòng cuối cùng (nhưng thấp hơn pattern 1)
+          const priority = 25 + (lastLines.length - i) * 2; // Dòng cuối có priority cao hơn
           foundAmounts.push({ 
             amount, 
-            priority: 25 - i, 
+            priority, 
             position: lineIndex + matchIndex,
             currency: line.includes('₫') || line.match(/vnđ|vnd|đồng|đ/i) ? 'VND' : undefined
           });
@@ -159,9 +209,9 @@ const extractAmount = (_normalizedText: string, originalText: string): { amount:
     }
   }
 
-  // 3. Tìm số tiền với từ khóa rõ ràng trong toàn bộ text - Priority trung bình
+  // 4. Tìm số tiền với từ khóa rõ ràng trong toàn bộ text - Priority trung bình (fallback)
+  // Lưu ý: Các pattern này đã được xử lý ở bước 1, nhưng giữ lại để đảm bảo không bỏ sót
   const keywordPatterns = [
-    /(?:tổng|total|thanh\s+toán|payment|amount|tổng\s+cộng|tổng\s+tiền|thành\s+tiền|cộng\s+tiền|grand\s+total)[\s:]*([\d.,\s]+)/gi,
     /(?:giá|price|cost|giá\s+trị|value|tiền\s+hàng)[\s:]*([\d.,\s]+)/gi,
     /(?:số\s+tiền|amount|tiền)[\s:]*([\d.,\s]+)/gi,
   ];
@@ -171,8 +221,8 @@ const extractAmount = (_normalizedText: string, originalText: string): { amount:
     for (const match of matches) {
       if (match[1]) {
         const amount = parseAmount(match[1]);
-        if (amount) {
-          foundAmounts.push({ amount, priority: 15 - index, position: match.index || 0 });
+        if (amount && amount >= 10000) {
+          foundAmounts.push({ amount, priority: 12 - index, position: match.index || 0 });
         }
       }
     }
@@ -245,16 +295,60 @@ const extractAmount = (_normalizedText: string, originalText: string): { amount:
       if (b.priority !== a.priority) {
         return b.priority - a.priority;
       }
-      // Nếu cùng priority, ưu tiên số ở cuối bill hơn
+      // Nếu cùng priority, ưu tiên số ở cuối bill hơn (position lớn hơn)
       if (b.position !== a.position) {
         return b.position - a.position;
       }
-      // Nếu cùng vị trí, lấy số lớn hơn
+      // Nếu cùng vị trí, lấy số lớn hơn (thường là tổng tiền)
       return b.amount - a.amount;
     });
     
-    const bestAmount = foundAmounts[0];
+    // Cải thiện: Nếu có nhiều số tiền, ưu tiên số lớn nhất hợp lý ở cuối bill
+    // Loại bỏ các số tiền quá nhỏ (có thể là giá từng món)
+    const validAmounts = foundAmounts.filter(a => a.amount >= 10000); // Ít nhất 10,000
     
+    if (validAmounts.length > 0) {
+      // Tìm số tiền lớn nhất ở cuối bill (40% cuối của text)
+      const textLength = originalText.length;
+      const lastPartStart = textLength * 0.6; // 40% cuối của text
+      
+      const amountsInLastPart = validAmounts.filter(a => a.position >= lastPartStart);
+      
+      if (amountsInLastPart.length > 0) {
+        // Ưu tiên: priority cao nhất, sau đó là số lớn nhất
+        amountsInLastPart.sort((a, b) => {
+          if (b.priority !== a.priority) {
+            return b.priority - a.priority;
+          }
+          // Nếu cùng priority, ưu tiên số lớn hơn (thường là tổng tiền)
+          return b.amount - a.amount;
+        });
+        
+        const bestAmount = amountsInLastPart[0];
+        return {
+          amount: bestAmount.amount,
+          amountPosition: bestAmount.position,
+        };
+      }
+      
+      // Nếu không có ở cuối, lấy số lớn nhất có priority cao
+      validAmounts.sort((a, b) => {
+        if (b.priority !== a.priority) {
+          return b.priority - a.priority;
+        }
+        // Nếu cùng priority, ưu tiên số lớn hơn
+        return b.amount - a.amount;
+      });
+      
+      const bestAmount = validAmounts[0];
+      return {
+        amount: bestAmount.amount,
+        amountPosition: bestAmount.position,
+      };
+    }
+    
+    // Fallback: lấy số đầu tiên (đã được sắp xếp)
+    const bestAmount = foundAmounts[0];
     return {
       amount: bestAmount.amount,
       amountPosition: bestAmount.position,

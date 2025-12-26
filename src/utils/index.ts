@@ -6,3 +6,4 @@ export * from './currencyInput';
 export * from './search';
 export * from './export';
 export * from './analytics';
+export * from './insights';

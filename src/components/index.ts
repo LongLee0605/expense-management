@@ -10,5 +10,7 @@ export { default as ImageUpload } from './ImageUpload';
 export { default as ConfirmDialog } from './ConfirmDialog';
 export { default as ToastItem } from './Toast';
 export { default as ToastContainer } from './ToastContainer';
+export { default as SmartInsightsWidget } from './SmartInsightsWidget';
+export { default as QuickAddTransaction } from './QuickAddTransaction';
 export type { Toast, ToastType } from './Toast';
 

@@ -31,6 +31,7 @@ const ScanBillPage = () => {
   const [editableText, setEditableText] = useState('');
   const [isEditingText, setIsEditingText] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
+  const [showImageModal, setShowImageModal] = useState(false);
   
   const [formData, setFormData] = useState({
     amount: '',
@@ -224,37 +225,6 @@ const ScanBillPage = () => {
         </p>
       </div>
 
-      <Card>
-        <h3 className="text-lg font-semibold mb-4">Phương thức quét</h3>
-        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <div className="flex items-center mb-2">
-            <span className="text-2xl mr-3">📄</span>
-            <div>
-              <p className="font-semibold text-blue-800">OCR (Optical Character Recognition)</p>
-              <p className="text-sm text-blue-600">Sử dụng Tesseract.js để nhận diện text từ ảnh</p>
-            </div>
-          </div>
-          <div className="mt-3 text-sm text-blue-700">
-            <p className="mb-1">✅ Hoàn toàn miễn phí</p>
-            <p className="mb-1">✅ Không cần API key</p>
-            <p>✅ Hoạt động offline</p>
-          </div>
-        </div>
-      </Card>
-
-      {/* Tips */}
-      <Card>
-        <div className="bg-blue-50 border-l-4 border-blue-500 p-4">
-          <h4 className="font-semibold text-blue-900 mb-2">💡 Mẹo để quét tốt hơn:</h4>
-          <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
-            <li>Đảm bảo ảnh rõ nét, đủ ánh sáng</li>
-            <li>Hóa đơn phải nằm ngang, không bị nghiêng</li>
-            <li>Text phải rõ ràng, không bị mờ hoặc che khuất</li>
-            <li>Nếu kết quả không chính xác, bạn có thể chỉnh sửa text và phân tích lại</li>
-          </ul>
-        </div>
-      </Card>
-
       {/* Upload Image */}
       <Card>
         <h3 className="text-lg font-semibold mb-4">1. Upload ảnh hóa đơn</h3>
@@ -263,6 +233,18 @@ const ScanBillPage = () => {
           preview={imagePreview}
           disabled={isProcessing}
         />
+        {imagePreview && (
+          <div className="mt-3 flex justify-center">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setShowImageModal(true)}
+              className="text-sm"
+            >
+              🔍 Xem ảnh lớn
+            </Button>
+          </div>
+        )}
       </Card>
 
       {/* Scan Button */}
@@ -302,6 +284,18 @@ const ScanBillPage = () => {
           <div className="flex justify-between items-center mb-2">
             <h3 className="text-lg font-semibold">Text đã quét được</h3>
             <div className="flex space-x-2">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => {
+                  navigator.clipboard.writeText(extractedText);
+                  showSuccess('Đã copy text vào clipboard!');
+                }}
+                className="text-sm"
+                title="Copy text"
+              >
+                📋 Copy
+              </Button>
               {!isEditingText ? (
                 <Button
                   type="button"
@@ -562,6 +556,62 @@ const ScanBillPage = () => {
               </Button>
             </div>
           </form>
+        </Card>
+      )}
+
+      {/* Image Modal */}
+      {showImageModal && imagePreview && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+          onClick={() => setShowImageModal(false)}
+        >
+          <div className="relative max-w-4xl max-h-[90vh]">
+            <button
+              onClick={() => setShowImageModal(false)}
+              className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 z-10"
+              title="Đóng"
+            >
+              ✕
+            </button>
+            <img
+              src={imagePreview}
+              alt="Hóa đơn"
+              className="max-w-full max-h-[90vh] object-contain rounded-lg"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Quick Actions - Copy Amount & Description */}
+      {analysisResult && analysisResult.amount > 0 && (
+        <Card>
+          <h3 className="text-lg font-semibold mb-3">Thao tác nhanh</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                const amountText = formatCurrency(analysisResult.amount, analysisResult.currency);
+                navigator.clipboard.writeText(amountText);
+                showSuccess(`Đã copy số tiền: ${amountText}`);
+              }}
+              className="text-sm"
+            >
+              💰 Copy số tiền
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                navigator.clipboard.writeText(analysisResult.description || '');
+                showSuccess('Đã copy mô tả!');
+              }}
+              className="text-sm"
+            >
+              📝 Copy mô tả
+            </Button>
+          </div>
         </Card>
       )}
     </div>
