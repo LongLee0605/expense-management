@@ -12,12 +12,25 @@ const ImageUpload = ({ onImageSelect, preview, disabled }: ImageUploadProps) => 
   const [dragActive, setDragActive] = useState(false);
   const { showError } = useToast();
 
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
   const handleFile = (file: File) => {
-    if (file && file.type.startsWith('image/')) {
-      onImageSelect(file);
-    } else {
+    if (!file) {
       showError('Vui lòng chọn file ảnh hợp lệ');
+      return;
     }
+
+    if (!file.type.startsWith('image/')) {
+      showError('Vui lòng chọn file ảnh hợp lệ');
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      showError(`File ảnh quá lớn. Kích thước tối đa là 5MB (hiện tại: ${(file.size / 1024 / 1024).toFixed(2)}MB)`);
+      return;
+    }
+
+    onImageSelect(file);
   };
 
   const handleDrag = (e: React.DragEvent) => {
@@ -90,7 +103,7 @@ const ImageUpload = ({ onImageSelect, preview, disabled }: ImageUploadProps) => 
               hoặc click để chọn file
             </p>
             <p className="text-xs text-gray-400 mt-2">
-              Hỗ trợ: JPG, PNG, GIF
+              Hỗ trợ: JPG, PNG, GIF (tối đa 5MB)
             </p>
           </div>
         </div>
