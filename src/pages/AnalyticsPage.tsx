@@ -147,7 +147,7 @@ const AnalyticsPage = () => {
 
       {/* Biểu đồ tròn - Chi tiêu theo danh mục */}
       <Card>
-        <h3 className="text-xl font-semibold mb-4">
+        <h3 className="text-xl font-semibold mb-4" >
           🥧 Phân bổ chi tiêu theo danh mục
         </h3>
         <CategoryPieChart transactions={filteredTransactions} currency={selectedCurrency} />

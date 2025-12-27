@@ -44,7 +44,7 @@ const CategoryPieChart = ({ transactions, currency = 'VND' }: CategoryPieChartPr
   }
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height={350}>
       <PieChart>
         <Pie
           data={chartData}
