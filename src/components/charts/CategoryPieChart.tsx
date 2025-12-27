@@ -44,8 +44,7 @@ const CategoryPieChart = ({ transactions, currency = 'VND' }: CategoryPieChartPr
   }
 
   return (
-    <div className="w-full" style={{ minHeight: '300px' }}>
-      <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height={300}>
       <PieChart>
         <Pie
           data={chartData}
@@ -65,11 +64,15 @@ const CategoryPieChart = ({ transactions, currency = 'VND' }: CategoryPieChartPr
           formatter={(value: number | undefined) => 
             value !== undefined ? formatCurrency(value, currency as Currency) : ''
           }
+          contentStyle={{
+            backgroundColor: 'white',
+            border: '1px solid #e5e7eb',
+            borderRadius: '8px',
+          }}
         />
         <Legend />
       </PieChart>
     </ResponsiveContainer>
-    </div>
   );
 };
 

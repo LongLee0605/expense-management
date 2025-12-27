@@ -33,14 +33,14 @@ const AnalyticsPage = () => {
   }, [transactions]);
 
   return (
-    <div className="space-y-4 sm:space-y-6 pb-20">
+    <div className="space-y-6 pb-20">
       {/* Header với currency selector */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
-        <h2 className="text-lg sm:text-xl md:text-2xl font-bold">Phân tích tài chính</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">Phân tích tài chính</h2>
         <select
           value={selectedCurrency}
           onChange={(e) => setSelectedCurrency(e.target.value)}
-          className="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
         >
           {availableCurrencies.map((currency) => (
             <option key={currency} value={currency}>
@@ -51,28 +51,28 @@ const AnalyticsPage = () => {
       </div>
 
       {/* Metrics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
-          <div className="p-3 sm:p-4">
-            <p className="text-xs sm:text-sm text-gray-600 mb-1">Tổng thu nhập</p>
-            <p className="text-xl sm:text-2xl font-bold text-green-600 break-words">
+          <div className="p-4">
+            <p className="text-sm text-gray-600 mb-1">Tổng thu nhập</p>
+            <p className="text-2xl font-bold text-green-600">
               {formatCurrency(metrics.totalIncome, selectedCurrency as Currency)}
             </p>
           </div>
         </Card>
         <Card>
-          <div className="p-3 sm:p-4">
-            <p className="text-xs sm:text-sm text-gray-600 mb-1">Tổng chi tiêu</p>
-            <p className="text-xl sm:text-2xl font-bold text-red-600 break-words">
+          <div className="p-4">
+            <p className="text-sm text-gray-600 mb-1">Tổng chi tiêu</p>
+            <p className="text-2xl font-bold text-red-600">
               {formatCurrency(metrics.totalExpense, selectedCurrency as Currency)}
             </p>
           </div>
         </Card>
         <Card>
-          <div className="p-3 sm:p-4">
-            <p className="text-xs sm:text-sm text-gray-600 mb-1">Số dư</p>
+          <div className="p-4">
+            <p className="text-sm text-gray-600 mb-1">Số dư</p>
             <p
-              className={`text-xl sm:text-2xl font-bold break-words ${
+              className={`text-2xl font-bold ${
                 metrics.balance >= 0 ? 'text-blue-600' : 'text-red-600'
               }`}
             >
@@ -81,10 +81,10 @@ const AnalyticsPage = () => {
           </div>
         </Card>
         <Card>
-          <div className="p-3 sm:p-4">
-            <p className="text-xs sm:text-sm text-gray-600 mb-1">Tỷ lệ tiết kiệm</p>
+          <div className="p-4">
+            <p className="text-sm text-gray-600 mb-1">Tỷ lệ tiết kiệm</p>
             <p
-              className={`text-xl sm:text-2xl font-bold break-words ${
+              className={`text-2xl font-bold ${
                 metrics.savingsRate >= 0 ? 'text-green-600' : 'text-red-600'
               }`}
             >

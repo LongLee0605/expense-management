@@ -122,8 +122,8 @@ const EditTransactionPage = () => {
 
   return (
     <div className="max-w-2xl mx-auto pb-20">
-      <div className="bg-white rounded-lg shadow p-4 sm:p-5 md:p-6">
-        <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-6">Sửa giao dịch</h2>
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-2xl font-bold mb-6">Sửa giao dịch</h2>
 
         {/* Type Selector */}
         <div className="mb-6">
@@ -160,7 +160,7 @@ const EditTransactionPage = () => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Currency */}
           <div>
             <label
@@ -288,7 +288,7 @@ const EditTransactionPage = () => {
 
           {/* Tags */}
           <div>
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Tags
             </label>
             <div className="flex flex-wrap gap-2 mb-2">

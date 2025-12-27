@@ -108,9 +108,9 @@ const InstallPrompt = () => {
   if (isIOS && !deferredPrompt) {
     return (
       <Card className="mb-4">
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 p-3 sm:p-4 md:p-5 rounded-lg">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 p-4 md:p-5 rounded-lg">
           <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
-            <span className="text-3xl sm:text-4xl">📱</span>
+            <span className="text-4xl sm:text-5xl">📱</span>
             <div className="flex-1 min-w-0">
               <h3 className="font-bold text-base sm:text-lg text-blue-900 mb-2">Cài đặt ứng dụng trên iOS</h3>
               <ol className="text-sm sm:text-base text-blue-800 space-y-2 list-decimal list-inside">
@@ -135,9 +135,9 @@ const InstallPrompt = () => {
   if (isAndroid && !deferredPrompt) {
     return (
       <Card className="mb-4">
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 p-3 sm:p-4 md:p-5 rounded-lg">
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 p-4 md:p-5 rounded-lg">
           <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
-            <span className="text-3xl sm:text-4xl">🤖</span>
+            <span className="text-4xl sm:text-5xl">🤖</span>
             <div className="flex-1 min-w-0">
               <h3 className="font-bold text-base sm:text-lg text-green-900 mb-2">Cài đặt ứng dụng trên Android</h3>
               <ol className="text-sm sm:text-base text-green-800 space-y-2 list-decimal list-inside">
@@ -164,7 +164,7 @@ const InstallPrompt = () => {
       <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 p-4 md:p-5 rounded-lg">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0">
           <div className="flex items-center space-x-3 sm:space-x-4 flex-1 min-w-0">
-            <span className="text-3xl sm:text-4xl flex-shrink-0">📲</span>
+            <span className="text-4xl sm:text-5xl flex-shrink-0">📲</span>
             <div className="min-w-0 flex-1">
               <h3 className="font-bold text-base sm:text-lg text-green-900 mb-1">Cài đặt ứng dụng</h3>
               <p className="text-sm sm:text-base text-green-800">
