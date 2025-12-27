@@ -218,10 +218,10 @@ const ScanBillPage = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-20">
+    <div className="max-w-full lg:max-w-4xl mx-auto space-y-4 sm:space-y-5 md:space-y-6 pb-20 w-full lg:px-3">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Quét hóa đơn</h2>
-        <p className="text-sm text-gray-600">
+        <h2 className="text-xl sm:text-2xl font-bold mb-2">Quét hóa đơn</h2>
+        <p className="text-xs sm:text-sm text-gray-600">
           Upload ảnh hóa đơn để tự động trích xuất thông tin giao dịch
         </p>
       </div>

@@ -33,14 +33,14 @@ const AnalyticsPage = () => {
   }, [transactions]);
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-4 sm:space-y-5 md:space-y-6 pb-20 w-full">
       {/* Header với currency selector */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Phân tích tài chính</h2>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+        <h2 className="text-xl sm:text-2xl font-bold">Phân tích tài chính</h2>
         <select
           value={selectedCurrency}
           onChange={(e) => setSelectedCurrency(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          className="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
         >
           {availableCurrencies.map((currency) => (
             <option key={currency} value={currency}>
@@ -51,7 +51,7 @@ const AnalyticsPage = () => {
       </div>
 
       {/* Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <Card>
           <div className="p-4">
             <p className="text-sm text-gray-600 mb-1">Tổng thu nhập</p>
@@ -95,7 +95,7 @@ const AnalyticsPage = () => {
       </div>
 
       {/* Additional Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         <Card>
           <div className="p-4">
             <p className="text-sm text-gray-600 mb-1">Chi tiêu TB/ngày</p>
@@ -154,7 +154,7 @@ const AnalyticsPage = () => {
       </Card>
 
       {/* Thông tin chi tiết */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
         <Card>
           <h3 className="text-lg font-semibold mb-4">Thống kê giao dịch</h3>
           <div className="space-y-2">

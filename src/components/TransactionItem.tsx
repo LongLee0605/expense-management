@@ -34,51 +34,51 @@ const TransactionItem = ({
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow p-4 mb-3 hover:shadow-md transition-shadow">
-        <div className="flex items-start justify-between">
-          <div className="flex items-start space-x-3 flex-1">
+      <div className="bg-white rounded-lg shadow p-3 sm:p-4 mb-3 hover:shadow-md transition-shadow w-full">
+        <div className="flex items-start justify-between gap-4 lg:flex-row flex-col">
+          <div className="flex items-start gap-2 flex-1 min-w-0">
             <div
-              className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${
+              className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-xl sm:text-2xl flex-shrink-0 ${
                 category?.color || 'bg-gray-500'
               }`}
             >
               {category?.icon || '📦'}
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-gray-900 truncate">
+              <h3 className="font-semibold text-sm sm:text-base text-gray-900 truncate">
                 {transaction.description || category?.name || 'Không có mô tả'}
               </h3>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-xs sm:text-sm text-gray-500 mt-1 truncate">
                 {category?.name || 'Khác'} • {formatDate(transaction.date, transaction.currency)}
               </p>
             </div>
           </div>
-          <div className="flex items-center space-x-2 ml-4">
+          <div className="flex items-center gap-1 flex-shrink-0 w-full justify-end">
             <div className="text-right">
               <p
-                className={`text-lg font-bold ${
+                className={`text-sm sm:text-base md:text-lg font-bold break-words ${
                   transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
                 }`}
               >
                 {transaction.type === 'income' ? '+' : '-'}
                 {formatCurrency(transaction.amount, transaction.currency)}
               </p>
-              <p className="text-xs text-gray-500 mt-1">{transaction.currency}</p>
+              <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">{transaction.currency}</p>
             </div>
-            <div className="flex space-x-1">
+            <div className="flex flex-row gap-1">
               <button
                 onClick={() => onEdit(transaction)}
-                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                className="p-1.5 sm:p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                 aria-label="Sửa"
               >
-                ✏️
+                <span className="text-base sm:text-lg">✏️</span>
               </button>
               <button
                 onClick={handleDelete}
-                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                className="p-1.5 sm:p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                 aria-label="Xóa"
               >
-                🗑️
+                <span className="text-base sm:text-lg">🗑️</span>
               </button>
             </div>
           </div>

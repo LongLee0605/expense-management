@@ -64,14 +64,14 @@ const TransactionsListPage = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <div className="space-y-4">
+      <div className="bg-white rounded-lg shadow p-3 sm:p-4">
+        <div className="space-y-3 sm:space-y-4">
           {/* Type Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
               Loại giao dịch
             </label>
-            <div className="flex space-x-2">
+            <div className="flex flex-wrap gap-2">
               {[
                 { value: 'all', label: 'Tất cả' },
                 { value: 'income', label: 'Thu nhập' },
@@ -82,7 +82,7 @@ const TransactionsListPage = () => {
                   onClick={() =>
                     setFilterType(option.value as 'all' | 'income' | 'expense')
                   }
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors flex-1 sm:flex-none ${
                     filterType === option.value
                       ? 'bg-blue-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -132,22 +132,22 @@ const TransactionsListPage = () => {
 
       {/* Transactions List */}
       <div>
-        <div className="mb-4 flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-gray-700">
+        <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-700">
             {filteredAndSortedTransactions.length} giao dịch
           </h2>
-          <div className="flex space-x-2">
+          <div className="flex gap-2 w-full sm:w-auto">
             <Button
               variant="secondary"
               onClick={() => exportToCSV(filteredAndSortedTransactions)}
-              className="text-sm"
+              className="text-xs sm:text-sm flex-1 sm:flex-none"
             >
               📥 CSV
             </Button>
             <Button
               variant="secondary"
               onClick={() => exportToJSON(filteredAndSortedTransactions)}
-              className="text-sm"
+              className="text-xs sm:text-sm flex-1 sm:flex-none"
             >
               📥 JSON
             </Button>

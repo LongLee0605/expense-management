@@ -79,11 +79,11 @@ const AddTransactionPage = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto pb-20">
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-2xl font-bold mb-6">Thêm giao dịch mới</h2>
+    <div className="max-w-full lg:max-w-2xl mx-auto pb-20 w-full lg:px-3">
+      <div className="bg-white rounded-lg shadow p-4 sm:p-5 md:p-6 w-full">
+        <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-5 md:mb-6">Thêm giao dịch mới</h2>
 
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-5 md:mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Loại giao dịch
           </label>
@@ -94,7 +94,7 @@ const AddTransactionPage = () => {
           />
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 md:space-y-6">
           <TransactionFormFields
             type={type}
             formData={formData}
@@ -102,16 +102,16 @@ const AddTransactionPage = () => {
             onCurrencyChange={handleCurrencyChange}
           />
 
-          <div className="flex space-x-4">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4">
             <Button
               type="button"
               variant="secondary"
               onClick={() => navigate('/')}
-              className="flex-1"
+              className="flex-1 w-full sm:w-auto"
             >
               Hủy
             </Button>
-            <Button type="submit" variant="primary" className="flex-1">
+            <Button type="submit" variant="primary" className="flex-1 w-full sm:w-auto">
               Thêm giao dịch
             </Button>
           </div>
