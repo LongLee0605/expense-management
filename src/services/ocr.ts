@@ -2,6 +2,69 @@
 const OCR_SPACE_API_URL = 'https://api.ocr.space/parse/image';
 const OCR_SPACE_API_KEY = import.meta.env.VITE_OCR_SPACE_API_KEY || 'K89790724088957';
 
+const OCR_MAX_SIZE = 1024 * 1024; // 1MB - giới hạn của OCR.space API
+
+const compressImage = async (
+  canvas: HTMLCanvasElement,
+  maxSize: number,
+  quality: number = 0.9,
+  useJpeg: boolean = false
+): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    const mimeType = useJpeg ? 'image/jpeg' : 'image/png';
+    const outputQuality = useJpeg ? quality : undefined;
+
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          reject(new Error('Không thể tạo blob từ canvas'));
+          return;
+        }
+
+        // Nếu file vẫn > maxSize và quality > 0.3, giảm quality và thử lại
+        if (blob.size > maxSize && quality > 0.3) {
+          const newQuality = Math.max(0.3, quality - 0.1);
+          compressImage(canvas, maxSize, newQuality, useJpeg || quality < 0.6)
+            .then(resolve)
+            .catch(reject);
+          return;
+        }
+
+        // Nếu vẫn > maxSize, giảm kích thước canvas
+        if (blob.size > maxSize) {
+          const ratio = Math.sqrt(maxSize / blob.size) * 0.9;
+          const newWidth = Math.round(canvas.width * ratio);
+          const newHeight = Math.round(canvas.height * ratio);
+          
+          const tempCanvas = document.createElement('canvas');
+          const tempCtx = tempCanvas.getContext('2d');
+          if (!tempCtx) {
+            reject(new Error('Không thể tạo canvas context'));
+            return;
+          }
+          
+          tempCanvas.width = newWidth;
+          tempCanvas.height = newHeight;
+          tempCtx.drawImage(canvas, 0, 0, newWidth, newHeight);
+          
+          compressImage(tempCanvas, maxSize, 0.7, true)
+            .then(resolve)
+            .catch(reject);
+          return;
+        }
+
+        const processedFile = new File([blob], 'processed.jpg', {
+          type: mimeType,
+          lastModified: Date.now(),
+        });
+        resolve(processedFile);
+      },
+      mimeType,
+      outputQuality
+    );
+  });
+};
+
 const preprocessImage = async (imageFile: File): Promise<File> => {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -13,7 +76,8 @@ const preprocessImage = async (imageFile: File): Promise<File> => {
       return;
     }
 
-    img.onload = () => {
+    img.onload = async () => {
+      // Giảm kích thước ban đầu để tối ưu
       const maxWidth = 2000;
       const maxHeight = 2000;
       let width = img.width;
@@ -53,21 +117,13 @@ const preprocessImage = async (imageFile: File): Promise<File> => {
 
       ctx.putImageData(imageData, 0, 0);
 
-      canvas.toBlob(
-        (blob) => {
-          if (blob) {
-            const processedFile = new File([blob], imageFile.name, {
-              type: 'image/png',
-              lastModified: Date.now(),
-            });
-            resolve(processedFile);
-          } else {
-            reject(new Error('Không thể xử lý ảnh'));
-          }
-        },
-        'image/png',
-        0.95
-      );
+      try {
+        // Compress image để đảm bảo < 1MB
+        const compressedFile = await compressImage(canvas, OCR_MAX_SIZE, 0.85, false);
+        resolve(compressedFile);
+      } catch (error) {
+        reject(error);
+      }
     };
 
     img.onerror = reject;
@@ -113,9 +169,15 @@ export const extractTextFromImage = async (
     onProgress?.(50);
     onStatus?.('Đang nhận diện text...');
 
+    // Kiểm tra kích thước base64 (base64 tăng ~33% so với binary)
+    const base64Size = (base64Image.length * 3) / 4;
+    if (base64Size > OCR_MAX_SIZE) {
+      throw new Error(`Ảnh sau khi xử lý vẫn quá lớn (${(base64Size / 1024 / 1024).toFixed(2)}MB). Vui lòng thử ảnh nhỏ hơn hoặc chất lượng thấp hơn.`);
+    }
+
     const formData = new FormData();
     formData.append('apikey', OCR_SPACE_API_KEY);
-    formData.append('base64Image', `data:image/png;base64,${base64Image}`);
+    formData.append('base64Image', `data:${processedImage.type};base64,${base64Image}`);
     formData.append('language', 'auto');
     formData.append('isOverlayRequired', 'false');
     formData.append('detectOrientation', 'true');

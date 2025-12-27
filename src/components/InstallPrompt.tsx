@@ -11,15 +11,21 @@ const InstallPrompt = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const checkInstalled = () => {
+      // Kiểm tra nếu đang chạy ở chế độ standalone (đã cài đặt)
       if (window.matchMedia('(display-mode: standalone)').matches) {
         setIsInstalled(true);
         return true;
       }
+      // Kiểm tra cho iOS
       if ((window.navigator as any).standalone === true) {
+        setIsInstalled(true);
+        return true;
+      }
+      // Kiểm tra cho các trình duyệt khác
+      if (window.matchMedia('(display-mode: fullscreen)').matches) {
         setIsInstalled(true);
         return true;
       }
@@ -34,24 +40,43 @@ const InstallPrompt = () => {
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     };
 
-    setIsMobile(checkMobile());
+    const isMobileDevice = checkMobile();
 
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-      setShowPrompt(true);
+      const promptEvent = e as BeforeInstallPromptEvent;
+      setDeferredPrompt(promptEvent);
+      // Hiển thị prompt sau 1 giây
+      setTimeout(() => {
+        if (!checkInstalled()) {
+          setShowPrompt(true);
+        }
+      }, 1000);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    
     window.addEventListener('appinstalled', () => {
       setIsInstalled(true);
       setShowPrompt(false);
       setDeferredPrompt(null);
+      localStorage.removeItem('pwa-install-dismissed');
     });
 
-    if (isMobile || checkMobile()) {
+    // Kiểm tra nếu đã dismiss trước đó
+    const dismissed = localStorage.getItem('pwa-install-dismissed');
+    if (dismissed) {
+      const dismissedTime = parseInt(dismissed, 10);
+      const daysSinceDismissed = (Date.now() - dismissedTime) / (1000 * 60 * 60 * 24);
+      if (daysSinceDismissed < 7) {
+        return;
+      }
+    }
+
+    // Hiển thị prompt cho mobile sau 2 giây nếu không có beforeinstallprompt
+    if (isMobileDevice) {
       setTimeout(() => {
-        if (!checkInstalled()) {
+        if (!checkInstalled() && !deferredPrompt) {
           setShowPrompt(true);
         }
       }, 2000);
