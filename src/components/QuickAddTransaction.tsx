@@ -1,10 +1,19 @@
 import { useState, FormEvent } from 'react';
 import Card from './Card';
 import Button from './Button';
+import { TypeSelector, CurrencyInput } from './forms';
 import { Expense, Currency } from '../types';
 import { useTransactions } from '../hooks';
 import { useToast } from '../contexts/ToastContext';
-import { generateId, getTodayDate, formatCurrencyInput, parseCurrencyInput, EXPENSE_CATEGORIES, INCOME_CATEGORIES, CURRENCIES } from '../utils';
+import {
+  generateId,
+  getTodayDate,
+  parseCurrencyInput,
+  validateTransactionForm,
+  FORM_MESSAGES,
+  EXPENSE_CATEGORIES,
+  INCOME_CATEGORIES,
+} from '../utils';
 
 interface QuickAddTransactionProps {
   onSuccess?: () => void;
@@ -24,11 +33,16 @@ const QuickAddTransaction = ({ onSuccess }: QuickAddTransactionProps) => {
 
   const categories = type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
 
+  const handleFieldChange = (field: string, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.amount || !formData.category) {
-      showError('Vui lòng điền đầy đủ thông tin');
+
+    const validation = validateTransactionForm(formData.amount, formData.category, formData.currency);
+    if (!validation.isValid) {
+      showError(validation.error || FORM_MESSAGES.REQUIRED_FIELDS);
       return;
     }
 
@@ -37,15 +51,15 @@ const QuickAddTransaction = ({ onSuccess }: QuickAddTransactionProps) => {
       amount: parseCurrencyInput(formData.amount, formData.currency),
       currency: formData.currency,
       category: formData.category,
-      description: formData.description || categories.find(c => c.id === formData.category)?.name || '',
+      description: formData.description || categories.find((c) => c.id === formData.category)?.name || '',
       date: getTodayDate(),
       type,
     };
 
     try {
       await addTransaction(transaction);
-      showSuccess('Thêm giao dịch thành công!');
-      
+      showSuccess(FORM_MESSAGES.TRANSACTION_ADDED);
+
       setFormData({
         amount: '',
         currency: 'VND',
@@ -55,7 +69,7 @@ const QuickAddTransaction = ({ onSuccess }: QuickAddTransactionProps) => {
       setIsOpen(false);
       onSuccess?.();
     } catch (error: any) {
-      const errorMessage = error?.message || 'Lỗi khi thêm giao dịch. Vui lòng thử lại.';
+      const errorMessage = error?.message || FORM_MESSAGES.ERROR_ADD;
       console.error('[Quick Add Transaction Error]', error);
       showError(errorMessage);
     }
@@ -88,61 +102,28 @@ const QuickAddTransaction = ({ onSuccess }: QuickAddTransactionProps) => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex space-x-2">
-          <button
-            type="button"
-            onClick={() => setType('expense')}
-            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
-              type === 'expense'
-                ? 'bg-red-100 text-red-700 border-2 border-red-300'
-                : 'bg-gray-100 text-gray-700 border-2 border-transparent'
-            }`}
-          >
-            💸 Chi tiêu
-          </button>
-          <button
-            type="button"
-            onClick={() => setType('income')}
-            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
-              type === 'income'
-                ? 'bg-green-100 text-green-700 border-2 border-green-300'
-                : 'bg-gray-100 text-gray-700 border-2 border-transparent'
-            }`}
-          >
-            💰 Thu nhập
-          </button>
-        </div>
+        <TypeSelector
+          value={type}
+          onChange={setType}
+          onTypeChange={() => handleFieldChange('category', '')}
+        />
 
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Số tiền *
-            </label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                {CURRENCIES[formData.currency]?.symbol || formData.currency}
-              </span>
-              <input
-                type="text"
-                required
-                value={formData.amount}
-                onChange={(e) => {
-                  const formatted = formatCurrencyInput(e.target.value, formData.currency);
-                  setFormData({ ...formData, amount: formatted });
-                }}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="0"
-              />
-            </div>
-          </div>
-
+          <CurrencyInput
+            value={formData.amount}
+            currency={formData.currency}
+            onChange={(value) => handleFieldChange('amount', value)}
+            required
+            label="Số tiền *"
+            showPlaceholder={false}
+          />
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Loại tiền
             </label>
             <select
               value={formData.currency}
-              onChange={(e) => setFormData({ ...formData, currency: e.target.value as Currency })}
+              onChange={(e) => handleFieldChange('currency', e.target.value as Currency)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
               <option value="VND">VND</option>
@@ -162,7 +143,7 @@ const QuickAddTransaction = ({ onSuccess }: QuickAddTransactionProps) => {
           <select
             required
             value={formData.category}
-            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+            onChange={(e) => handleFieldChange('category', e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Chọn danh mục</option>
@@ -181,7 +162,7 @@ const QuickAddTransaction = ({ onSuccess }: QuickAddTransactionProps) => {
           <input
             type="text"
             value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            onChange={(e) => handleFieldChange('description', e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             placeholder="Nhập mô tả (tùy chọn)"
           />
